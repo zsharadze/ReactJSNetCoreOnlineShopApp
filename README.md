@@ -2,7 +2,7 @@
 This is ReactJS and ASP.Net Core 8 Web Api Domain Driven Design online shop application with shopping cart and admin panel.
 
 ## Features
-Usage of Reactjs functional components, usage of React Redux Toolkit for state management, usage of Material UI, authentication (token), authorization (roles), shopping cart, placing orders with promo codes, search and pagination, admin panel for managing orders, products, categories and generating promo codes, change password functionality, login and register pages. There are 2 default roles: User and Admin.
+Usage of Reactjs functional components, usage of React Redux Toolkit for state management, usage of Material UI, authentication (token), authorization (roles), shopping cart, placing orders with promo codes, search and pagination, admin panel for managing orders, products, categories and generating promo codes, lazy loading admin panel component, change password functionality, login and register pages. There are 2 default roles: User and Admin.
 
 ## Getting Started
 1. Go to ASPNetCoreWebApi and open ASPNetCoreWebApi.sln in Visual Studio.
