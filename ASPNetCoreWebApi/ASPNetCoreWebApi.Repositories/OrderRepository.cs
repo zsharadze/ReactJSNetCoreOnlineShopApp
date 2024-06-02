@@ -1,7 +1,7 @@
 ﻿using ASPNetCoreWebApi.Domain.Extensions;
 using ASPNetCoreWebApi.Domain.Models;
 using ASPNetCoreWebApi.Domain.Repositories;
-using ASPNetCoreWebApi.Domain.ViewModels;
+using ASPNetCoreWebApi.Domain.Dtos;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,96 +67,118 @@ namespace ASPNetCoreWebApi.Repositories
             }
         }
 
-        public async Task<OrdersViewModel> GetAllItemsForCurrentUser(string userId, int? pageSize, int? pageIndex)
+        public async Task<OrdersDTO> GetAllItemsForCurrentUser(string userId, int pageSize, int pageIndex)
         {
-            OrdersViewModel result = new OrdersViewModel();
+            OrdersDTO result = new OrdersDTO();
 
-            if (pageSize == null || pageIndex == null)
-            {
-                result.OrderList = await _context.Orders.AsNoTracking().Include(x => x.OrderItems)
-            .ThenInclude(x => x.Product).Include(x => x.PromoCode).Where(x => x.UserId == userId).OrderByDescending(x => x.Id).ToListAsync();
-                return result;
-            }
+            var orders = _context.Orders.AsNoTracking()
+                .Include(x => x.OrderItems)
+                .ThenInclude(x => x.Product)
+                .Include(x => x.PromoCode)
+                .Where(x => x.UserId == userId)
+                .OrderByDescending(x => x.Id);
 
-            else if (pageSize.HasValue && pageIndex.HasValue)
-            {
-                var orders = _context.Orders.AsNoTracking().Include(x => x.OrderItems)
-            .ThenInclude(x => x.Product).Include(x => x.PromoCode).Where(x => x.UserId == userId).OrderByDescending(x => x.Id);
+            int totalCount = await orders.CountAsync();
+            PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex, pageSize, "");
+            result.Pager = pagerHelper.GetPager;
 
-                int totalCount = await orders.CountAsync();
-                PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex.Value, pageSize.Value, "");
-                result.Pager = pagerHelper.GetPager;
-
-                result.OrderList = await orders.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize)
-                    .Take(pagerHelper.PageSize)
-                    .ToListAsync();
-
-                return result;
-            }
-            else
-            {
-                throw new Exception("pageSize or pageIndex parameter is null");
-            }
+            result.OrderList = await orders.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize)
+                .Take(pagerHelper.PageSize)
+                .Select(x => new OrderForListDto()
+                {
+                    Id = x.Id,
+                    CreatedDate = x.CreatedDate,
+                    IsShipped = x.IsShipped,
+                    PromoCodeId = x.PromoCodeId,
+                    OrderItems = x.OrderItems.Select(ot => new OrderItemDTO()
+                    {
+                        Id = ot.Id,
+                        ProductId = ot.ProductId,
+                        Product = new ProductDTO()
+                        {
+                            Id = ot.Product.Id,
+                            CategoryId = ot.Product.CategoryId,
+                            CreatedDate = ot.Product.CreatedDate,
+                            Description = ot.Product.Description,
+                            ImageSrc = ot.Product.ImageSrc,
+                            Name = ot.Product.Name,
+                            Price = ot.Product.Price
+                        },
+                        Quantity = ot.Quantity
+                    }).ToList(),
+                    PromoCode = x.PromoCode == null ? null : new PromoCodeDTO()
+                    {
+                        Id = x.PromoCode.Id,
+                        CreatedDate = x.PromoCode.CreatedDate,
+                        Discount = x.PromoCode.Discount,
+                        IsUsed = x.PromoCode.IsUsed,
+                        PromoCodeText = x.PromoCode.PromoCodeText,
+                        UsedByUserEmail = x.PromoCode.UsedByUserEmail,
+                        UsedOnOrderId = x.PromoCode.OrderId,
+                    },
+                    Subtotal = x.Subtotal,
+                    SubtotalWithPromo = x.SubtotalWithPromo,
+                    UserEmail = x.UserEmail,
+                    UserId = x.UserId
+                })
+                .ToListAsync();
+            return result;
         }
 
-        public async Task<OrdersViewModel> GetAllItems(int? pageSize, int? pageIndex)
+        public async Task<OrdersDTO> GetAllItems(int pageSize, int pageIndex)
         {
-            OrdersViewModel result = new OrdersViewModel();
-            if (pageSize == null || pageIndex == null)
-            {
-                result.OrderList = await _context.Orders
-                    .AsNoTracking()
-                    .Include(x => x.PromoCode)
-                    .Include(x => x.OrderItems)
-                    .ThenInclude(x => x.Product)
-                    .Select(x => new Order
+            OrdersDTO result = new OrdersDTO();
+
+            int totalCount = await _context.Orders.AsNoTracking().CountAsync();
+            PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex, pageSize, "");
+            result.Pager = pagerHelper.GetPager;
+            result.OrderList = await _context.Orders.AsNoTracking()
+                .Include(x => x.PromoCode)
+                .Include(x => x.OrderItems)
+                .ThenInclude(x => x.Product)
+                .Include(x => x.User)
+                .OrderByDescending(x => x.Id)
+                .Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize)
+                .Take(pagerHelper.PageSize)
+                .Select(x => new OrderForListDto
+                {
+                    CreatedDate = x.CreatedDate,
+                    Id = x.Id,
+                    IsShipped = x.IsShipped,
+                    OrderItems = x.OrderItems.Select(ot => new OrderItemDTO()
                     {
-                        CreatedDate = x.CreatedDate,
-                        Id = x.Id,
-                        IsShipped = x.IsShipped,
-                        OrderItems = x.OrderItems,
-                        PromoCode = x.PromoCode,
-                        PromoCodeId = x.PromoCodeId,
-                        Subtotal = x.Subtotal,
-                        SubtotalWithPromo = x.SubtotalWithPromo,
-                        UserEmail = x.User.Email
-                    })
-                    .OrderByDescending(x => x.Id)
-                    .ToListAsync();
-                return result;
-            }
-            else if (pageSize.HasValue && pageIndex.HasValue)
-            {
-                int totalCount = await _context.Orders.AsNoTracking().CountAsync();
-                PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex.Value, pageSize.Value, "");
-                result.Pager = pagerHelper.GetPager;
-                result.OrderList = await _context.Orders.AsNoTracking()
-                    .Include(x => x.PromoCode)
-                    .Include(x => x.OrderItems)
-                    .ThenInclude(x => x.Product)
-                    .Include(x => x.User)
-                    .OrderByDescending(x => x.Id)
-                    .Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize)
-                    .Take(pagerHelper.PageSize)
-                    .Select(x => new Order
+                        Id = ot.Id,
+                        ProductId = ot.ProductId,
+                        Product = new ProductDTO()
+                        {
+                            Id = ot.Product.Id,
+                            CategoryId = ot.Product.CategoryId,
+                            CreatedDate = ot.Product.CreatedDate,
+                            Description = ot.Product.Description,
+                            ImageSrc = ot.Product.ImageSrc,
+                            Name = ot.Product.Name,
+                            Price = ot.Product.Price
+                        },
+                        Quantity = ot.Quantity
+                    }).ToList(),
+                    PromoCode = x.PromoCode == null ? null : new PromoCodeDTO()
                     {
-                        CreatedDate = x.CreatedDate,
-                        Id = x.Id,
-                        IsShipped = x.IsShipped,
-                        OrderItems = x.OrderItems,
-                        PromoCode = x.PromoCode,
-                        PromoCodeId = x.PromoCodeId,
-                        Subtotal = x.Subtotal,
-                        SubtotalWithPromo = x.SubtotalWithPromo,
-                        UserEmail = x.User.Email
-                    })
-                    .ToListAsync();
-                return result;
-            }
-            else
-            {
-                throw new Exception("pageSize or pageIndex parameter is null");
-            }
+                        Id = x.PromoCode.Id,
+                        CreatedDate = x.PromoCode.CreatedDate,
+                        Discount = x.PromoCode.Discount,
+                        IsUsed = x.PromoCode.IsUsed,
+                        PromoCodeText = x.PromoCode.PromoCodeText,
+                        UsedByUserEmail = x.PromoCode.UsedByUserEmail,
+                        UsedOnOrderId = x.PromoCode.OrderId,
+                    },
+                    PromoCodeId = x.PromoCodeId,
+                    Subtotal = x.Subtotal,
+                    SubtotalWithPromo = x.SubtotalWithPromo,
+                    UserEmail = x.User.Email
+                })
+                .ToListAsync();
+            return result;
+
         }
 
         public async Task<int> ShipOrder(int id)

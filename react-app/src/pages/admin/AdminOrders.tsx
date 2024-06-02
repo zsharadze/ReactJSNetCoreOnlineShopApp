@@ -45,7 +45,7 @@ const AdminOrders = () => {
       trs.push(
         <tr key={`orderItemId_${element.id}_orderId_${orderId}`}>
           <td
-            onClick={() => navigate("/details/" + element.id)}
+            onClick={() => navigate("/details/" + element.productId)}
             style={{ textAlign: "center" }}
           >
             <img

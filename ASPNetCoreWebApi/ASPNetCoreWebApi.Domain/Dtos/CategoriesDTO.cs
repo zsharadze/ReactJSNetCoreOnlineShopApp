@@ -1,14 +1,14 @@
 ﻿using ASPNetCoreWebApi.Domain.Extensions;
 
-namespace ASPNetCoreWebApi.Domain.ViewModels
+namespace ASPNetCoreWebApi.Domain.Dtos
 {
-    public class CategoriesViewModel
+    public class CategoriesDTO
     {
-        public List<CategoryDto> CategoryList { get; set; }
+        public List<CategoryForListDto> CategoryList { get; set; }
         public Pager Pager { get; set; }
     }
 
-    public class CategoryDto
+    public class CategoryForListDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

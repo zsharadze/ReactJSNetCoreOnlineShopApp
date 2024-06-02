@@ -1,6 +1,6 @@
-﻿namespace ASPNetCoreWebApi.Models
+﻿namespace ASPNetCoreWebApi.BindingModels
 {
-    public class ChangePasswordModel
+    public class ChangePassword
     {
         public string OldPassword { get; set; }
         public string NewPassword { get; set; }

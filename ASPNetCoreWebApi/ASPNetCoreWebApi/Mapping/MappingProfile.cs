@@ -1,6 +1,7 @@
-﻿using ASPNetCoreWebApi.Models;
+﻿using ASPNetCoreWebApi.BindingModels;
 using AutoMapper;
 using ASPNetCoreWebApi.Domain.Models;
+using ASPNetCoreWebApi.Domain.Dtos;
 
 namespace ASPNetCoreWebApi.Mapping
 {
@@ -8,7 +9,10 @@ namespace ASPNetCoreWebApi.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<CreateOrderRequestModel, OrderItem>();
+            CreateMap<CreateOrderRequestDTO, OrderItem>();
+            CreateMap<Category, CategoryDTO>().ReverseMap();
+            CreateMap<ProductDTO, Product>().ReverseMap();
+            CreateMap<PromoCode, PromoCodeDTO>();
         }
     }
 }

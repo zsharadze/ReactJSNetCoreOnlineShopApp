@@ -1,7 +1,7 @@
 ﻿using ASPNetCoreWebApi.Domain.Extensions;
 using ASPNetCoreWebApi.Domain.Models;
 using ASPNetCoreWebApi.Domain.Repositories;
-using ASPNetCoreWebApi.Domain.ViewModels;
+using ASPNetCoreWebApi.Domain.Dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASPNetCoreWebApi.Repositories
@@ -17,7 +17,6 @@ namespace ASPNetCoreWebApi.Repositories
 
         public async Task<int> Add(Product newItem)
         {
-            newItem.CreatedDate = DateTime.Now;
             _context.Products.Add(newItem);
             try
             {
@@ -29,10 +28,10 @@ namespace ASPNetCoreWebApi.Repositories
             }
         }
 
-        public async Task<ProductsViewModel> GetAllItems(int? categoryId, string searchText, int? pageSize, int? pageIndex)
+        public async Task<ProductsDTO> GetAllItems(int? categoryId, string searchText, int pageSize, int pageIndex)
         {
-            var result = new ProductsViewModel();
-            result.ProductList = new List<Product>();
+            var result = new ProductsDTO();
+            result.ProductList = new List<ProductDTO>();
 
             var products = _context.Products.AsNoTracking().Include(x => x.Category).Include(x => x.OrderItems).AsQueryable();
             string summaryTextAdd = "";
@@ -55,28 +54,42 @@ namespace ASPNetCoreWebApi.Repositories
                 || x.Description.ToLower().Contains(searchText.ToLower()));
             }
 
-            if (pageSize == null || pageIndex == null)
-            {
-                result.ProductList = await products.ToListAsync();
-                return result;
-            }
-            else if (pageSize.HasValue && pageIndex.HasValue)
-            {
-                int totalCount = await products.CountAsync();
-                PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex.Value, pageSize.Value, summaryTextAdd);
-                result.Pager = pagerHelper.GetPager;
-                result.ProductList = await products.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize).Take(pagerHelper.PageSize).ToListAsync();
-                return result;
-            }
-            else
-            {
-                throw new Exception("pageSize or pageIndex parameter is null");
-            }
+            int totalCount = await products.CountAsync();
+            PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex, pageSize, summaryTextAdd);
+            result.Pager = pagerHelper.GetPager;
+            result.ProductList = await products.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize).
+                Take(pagerHelper.PageSize).
+                Select(p => new ProductDTO
+                {
+                    CategoryId = p.CategoryId,
+                    CreatedDate = p.CreatedDate,
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    ImageSrc = p.ImageSrc,
+                    Price = p.Price,
+                    CategoryName = p.Category.Name,
+                    OrdersCount = p.OrderItems.Count()
+                }).
+                ToListAsync();
+            return result;
         }
 
-        public async Task<List<Product>> GetAllByIds(List<int> ids)
+        public async Task<List<ProductDTO>> GetAllByIds(List<int> ids)
         {
-            var products = await _context.Products.AsNoTracking().Where(x => ids.Contains(x.Id)).ToListAsync();
+            var products = await _context.Products.AsNoTracking()
+                .Where(x => ids.Contains(x.Id))
+                .Select(p => new ProductDTO
+                {
+                    CategoryId = p.CategoryId,
+                    CreatedDate = p.CreatedDate,
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    ImageSrc = p.ImageSrc,
+                    Price = p.Price
+                })
+                .ToListAsync();
             return products;
         }
 

@@ -1,7 +1,7 @@
 ﻿using ASPNetCoreWebApi.Domain.Extensions;
 using ASPNetCoreWebApi.Domain.Models;
 using ASPNetCoreWebApi.Domain.Repositories;
-using ASPNetCoreWebApi.Domain.ViewModels;
+using ASPNetCoreWebApi.Domain.Dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASPNetCoreWebApi.Repositories
@@ -17,8 +17,6 @@ namespace ASPNetCoreWebApi.Repositories
 
         public async Task<int> Add(Category newItem)
         {
-            if (!string.IsNullOrEmpty(newItem.FaClass))
-                newItem.FaClass = newItem.FaClass.Trim();
             _context.Categories.Add(newItem);
             try
             {
@@ -30,12 +28,12 @@ namespace ASPNetCoreWebApi.Repositories
             }
         }
 
-        public async Task<CategoriesViewModel> GetAllItems(string searchText, int? pageSize, int? pageIndex)
+        public async Task<CategoriesDTO> GetAllItems(string searchText, int? pageSize, int? pageIndex)
         {
-            var result = new CategoriesViewModel();
-            result.CategoryList = new List<CategoryDto>();
+            var result = new CategoriesDTO();
+            result.CategoryList = new List<CategoryForListDto>();
 
-            var categories = _context.Categories.AsNoTracking().Include(x => x.Products).Select(c => new CategoryDto
+            var categories = _context.Categories.AsNoTracking().Include(x => x.Products).Select(c => new CategoryForListDto
             {
                 Id = c.Id,
                 Name = c.Name,
@@ -106,8 +104,6 @@ namespace ASPNetCoreWebApi.Repositories
 
         public async Task<Category> Update(Category item)
         {
-            if (!string.IsNullOrEmpty(item.FaClass))
-                item.FaClass = item.FaClass.Trim();
             var existing = await _context.Categories.AsNoTracking().SingleOrDefaultAsync(a => a.Id == item.Id);
             if (existing != null)
             {

@@ -1,37 +1,41 @@
 ﻿using ASPNetCoreWebApi.Domain.Contracts;
 using ASPNetCoreWebApi.Domain.Models;
 using ASPNetCoreWebApi.Domain.Repositories;
-using ASPNetCoreWebApi.Domain.ViewModels;
+using ASPNetCoreWebApi.Domain.Dtos;
+using AutoMapper;
 
 namespace ASPNetCoreWebApi.Domain.Services
 {
     public class ProductService : IProductService
     {
         private readonly IProductRepository _repository;
+        private readonly IMapper _mapper;
 
-        public ProductService(IProductRepository productRepository)
+        public ProductService(IProductRepository productRepository, IMapper mapper)
         {
-            this._repository = productRepository;
+            _repository = productRepository;
+            _mapper = mapper;
         }
 
-        public Task<int> Add(Product newItem)
+        public Task<int> Add(ProductDTO newItem)
         {
-            return _repository.Add(newItem);
+            newItem.CreatedDate = DateTime.Now;
+            return _repository.Add(_mapper.Map<Product>(newItem));
         }
 
-        public Task<ProductsViewModel> GetAllItems(int? categoryId, string searchText, int? pageSize, int? pageIndex)
+        public Task<ProductsDTO> GetAllItems(int? categoryId, string searchText, int pageSize, int pageIndex)
         {
             return _repository.GetAllItems(categoryId, searchText, pageSize, pageIndex);
         }
 
-        public Task<List<Product>> GetAllByIds(List<int> ids)
+        public Task<List<ProductDTO>> GetAllByIds(List<int> ids)
         {
             return _repository.GetAllByIds(ids);
         }
 
-        public Task<Product> GetById(int id)
+        public async Task<ProductDTO> GetById(int id)
         {
-            return _repository.GetById(id);
+            return _mapper.Map<ProductDTO>(await _repository.GetById(id));
         }
 
         public Task<bool> Remove(int id)
@@ -39,9 +43,9 @@ namespace ASPNetCoreWebApi.Domain.Services
             return _repository.Remove(id);
         }
 
-        public Task<Product> Update(Product item)
+        public Task<Product> Update(ProductDTO item)
         {
-            return _repository.Update(item);
+            return _repository.Update(_mapper.Map<Product>(item));
         }
     }
 }

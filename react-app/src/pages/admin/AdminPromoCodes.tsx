@@ -28,7 +28,6 @@ const AdminPromoCodes = () => {
     promoCodeApi()
       .getAll(pageIndex ?? 1, pageSize)
       .then((res) => {
-        console.log("promoCodeApi getall res", res);
         setLoading(false);
         setPromoCodes(res.data);
       });

@@ -1,5 +1,5 @@
 ﻿using ASPNetCoreWebApi.Infrastructure;
-using ASPNetCoreWebApi.Models;
+using ASPNetCoreWebApi.BindingModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +27,7 @@ namespace ASPNetCoreWebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] Login model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
@@ -67,7 +67,7 @@ namespace ASPNetCoreWebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register([FromBody] Register model)
         {
             if (!_emailValidator.IsValidEmail(model.Email))
             {
@@ -103,7 +103,7 @@ namespace ASPNetCoreWebApi.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePassword model)
         {
             if (model.NewPassword != model.ConfirmPassword)
             {
@@ -125,7 +125,7 @@ namespace ASPNetCoreWebApi.Controllers
             {
                 return Ok(new ApiResponse() { Success = false, Message = "Old password is incorrect." });
             }
-        }        
+        }
 
         public string CurrentUserId
         {

@@ -1,7 +1,8 @@
 ﻿using ASPNetCoreWebApi.Domain.Contracts;
 using ASPNetCoreWebApi.Domain.Models;
 using ASPNetCoreWebApi.Domain.Repositories;
-using ASPNetCoreWebApi.Domain.ViewModels;
+using ASPNetCoreWebApi.Domain.Dtos;
+using AutoMapper;
 
 namespace ASPNetCoreWebApi.Domain.Services
 {
@@ -9,15 +10,19 @@ namespace ASPNetCoreWebApi.Domain.Services
     {
         private readonly IOrderRepository _repository;
         private readonly IProductService _productService;
+        private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository orderRepository, IProductService productService)
+        public OrderService(IOrderRepository orderRepository,
+            IProductService productService, IMapper mapper)
         {
-            this._repository = orderRepository;
+            _repository = orderRepository;
             _productService = productService;
+            _mapper = mapper;
         }
 
-        public async Task<int> CreateOrder(List<OrderItem> orderItems, string promoCode, string userId)
+        public async Task<int> CreateOrder(List<CreateOrderRequestDTO> orderItemList, string promoCode, string userId)
         {
+            var orderItems = _mapper.Map<List<OrderItem>>(orderItemList);
             decimal subTotal = 0;
             foreach (var item in orderItems)
             {
@@ -33,12 +38,12 @@ namespace ASPNetCoreWebApi.Domain.Services
             return await _repository.CreateOrder(orderItems, promoCode, subTotal, userId);
         }
 
-        public Task<OrdersViewModel> GetAllItemsForCurrentUser(string userId, int? pageSize, int? pageIndex)
+        public Task<OrdersDTO> GetAllItemsForCurrentUser(string userId, int pageSize, int pageIndex)
         {
             return _repository.GetAllItemsForCurrentUser(userId, pageSize, pageIndex);
         }
 
-        public Task<OrdersViewModel> GetAllItems(int? pageSize, int? pageIndex)
+        public Task<OrdersDTO> GetAllItems(int pageSize, int pageIndex)
         {
             return _repository.GetAllItems(pageSize, pageIndex);
         }

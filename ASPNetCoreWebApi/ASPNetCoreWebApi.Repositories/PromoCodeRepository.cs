@@ -1,7 +1,7 @@
 ﻿using ASPNetCoreWebApi.Domain.Extensions;
 using ASPNetCoreWebApi.Domain.Models;
 using ASPNetCoreWebApi.Domain.Repositories;
-using ASPNetCoreWebApi.Domain.ViewModels;
+using ASPNetCoreWebApi.Domain.Dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASPNetCoreWebApi.Repositories
@@ -17,7 +17,6 @@ namespace ASPNetCoreWebApi.Repositories
 
         public async Task<int> Add(PromoCode newItem)
         {
-            newItem.CreatedDate = DateTime.Now;
             _context.PromoCodes.Add(newItem);
             try
             {
@@ -52,10 +51,10 @@ namespace ASPNetCoreWebApi.Repositories
             return true;
         }
 
-        public async Task<PromoCodesViewModel> GetAllItems(string searchText, int? pageSize, int? pageIndex, bool? getOnlyUsed)
+        public async Task<PromoCodesDTO> GetAllItems(string searchText, int pageSize, int pageIndex, bool? getOnlyUsed)
         {
-            var result = new PromoCodesViewModel();
-            result.PromoCodeList = new List<PromoCode>();
+            var result = new PromoCodesDTO();
+            result.PromoCodeList = new List<PromoCodeDTO>();
 
             var promoCodes = _context.PromoCodes.AsNoTracking().Include(x => x.Order).ThenInclude(x => x.User).AsQueryable();
 
@@ -78,9 +77,12 @@ namespace ASPNetCoreWebApi.Repositories
                 promoCodes = promoCodes.Where(x => x.IsUsed);
             }
 
-            if (pageSize == null || pageIndex == null)
-            {
-                result.PromoCodeList = await promoCodes.Select(x => new PromoCode
+            int totalCount = await promoCodes.CountAsync();
+            PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex, pageSize, summaryTextAdd);
+            result.Pager = pagerHelper.GetPager;
+            result.PromoCodeList = await promoCodes.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize)
+                .Take(pagerHelper.PageSize)
+                .Select(x => new PromoCodeDTO
                 {
                     CreatedDate = x.CreatedDate,
                     Discount = x.Discount,
@@ -89,32 +91,8 @@ namespace ASPNetCoreWebApi.Repositories
                     PromoCodeText = x.PromoCodeText,
                     UsedOnOrderId = x.Order.Id,
                     UsedByUserEmail = x.Order.User.Email
-
                 }).ToListAsync();
-                return result;
-            }
-            else if (pageSize.HasValue && pageIndex.HasValue)
-            {
-                int totalCount = await promoCodes.CountAsync();
-                PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex.Value, pageSize.Value, summaryTextAdd);
-                result.Pager = pagerHelper.GetPager;
-                result.PromoCodeList = await promoCodes.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize).Take(pagerHelper.PageSize).Select(x => new PromoCode
-                {
-                    CreatedDate = x.CreatedDate,
-                    Discount = x.Discount,
-                    Id = x.Id,
-                    IsUsed = x.IsUsed,
-                    PromoCodeText = x.PromoCodeText,
-                    UsedOnOrderId = x.Order.Id,
-                    UsedByUserEmail = x.Order.User.Email
-
-                }).ToListAsync();
-                return result;
-            }
-            else
-            {
-                throw new Exception("pageSize or pageIndex parameter is null");
-            }
+            return result;
         }
 
         public async Task<PromoCode> GetByPromoCodeText(string promoCodeText)

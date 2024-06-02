@@ -1,4 +1,4 @@
-﻿namespace ASPNetCoreWebApi.Models
+﻿namespace ASPNetCoreWebApi.BindingModels
 {
     public static class UserRoles
     {

@@ -1,6 +1,6 @@
 ﻿using ASPNetCoreWebApi.Domain.Contracts;
-using ASPNetCoreWebApi.Domain.ViewModels;
-using ASPNetCoreWebApi.Models;
+using ASPNetCoreWebApi.Domain.Dtos;
+using ASPNetCoreWebApi.BindingModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +15,9 @@ namespace ASPNetCoreWebApi.Controllers
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
-        private readonly IMapper _mapper;
         public OrderController(IOrderService orderService, IMapper mapper)
         {
             _orderService = orderService;
-            _mapper = mapper;
         }
 
         public string CurrentUserId
@@ -33,28 +31,26 @@ namespace ASPNetCoreWebApi.Controllers
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(int), 200)]
-        public async Task<IActionResult> CreateOrder([FromBody] List<CreateOrderRequestModel> orderItems, string promoCode)
+        public async Task<IActionResult> CreateOrder([FromBody] List<CreateOrderRequestDTO> orderItems, string promoCode)
         {
             if (!orderItems.Any())
                 throw new Exception("Invalid order items passed");
-            var orderItemObjects = _mapper.Map<List<OrderItem>>(orderItems);
-            return Ok(await _orderService.CreateOrder(orderItemObjects, promoCode, CurrentUserId));
+            return Ok(await _orderService.CreateOrder(orderItems, promoCode, CurrentUserId));
         }
 
         [HttpGet]
         [Authorize]
-        [ProducesResponseType(typeof(OrdersViewModel), 200)]
-        public async Task<IActionResult> GetAllForCurrentUser(int? pageSize = 20, int? pageIndex = 1)
+        [ProducesResponseType(typeof(OrdersDTO), 200)]
+        public async Task<IActionResult> GetAllForCurrentUser(int pageSize = 20, int pageIndex = 1)
         {
-
             return Ok(await _orderService.GetAllItemsForCurrentUser(CurrentUserId, pageSize, pageIndex));
         }
 
         [HttpGet]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(OrdersViewModel), 200)]
+        [ProducesResponseType(typeof(OrdersDTO), 200)]
 
-        public async Task<IActionResult> GetAll(int? pageSize = 20, int? pageIndex = 1)
+        public async Task<IActionResult> GetAll(int pageSize = 20, int pageIndex = 1)
         {
             return Ok(await _orderService.GetAllItems(pageSize, pageIndex));
         }

@@ -1,6 +1,6 @@
 ﻿using ASPNetCoreWebApi.Domain.Contracts;
-using ASPNetCoreWebApi.Domain.ViewModels;
-using ASPNetCoreWebApi.Models;
+using ASPNetCoreWebApi.Domain.Dtos;
+using ASPNetCoreWebApi.BindingModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ASPNetCoreWebApi.Domain.Models;
@@ -20,14 +20,14 @@ namespace ASPNetCoreWebApi.Controllers
 
         [HttpGet]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(PromoCodesViewModel), 200)]
-        public async Task<IActionResult> GetAll(string searchText = null, int? pageSize = 20, int? pageIndex = 1, bool? getOnlyUsed = false)
+        [ProducesResponseType(typeof(PromoCodesDTO), 200)]
+        public async Task<IActionResult> GetAll(string searchText = null, int pageSize = 20, int pageIndex = 1, bool? getOnlyUsed = false)
         {
             return Ok(await _promoCodeService.GetAllItems(searchText, pageSize, pageIndex, getOnlyUsed));
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(PromoCode), 200)]
+        [ProducesResponseType(typeof(PromoCodeDTO), 200)]
         public async Task<IActionResult> GetByPromoCodeText(string promoCodeText)
         {
             return Ok(await _promoCodeService.GetByPromoCodeText(promoCodeText));

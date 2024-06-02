@@ -1,5 +1,5 @@
 ﻿using ASPNetCoreWebApi.Domain.Models;
-using ASPNetCoreWebApi.Models;
+using ASPNetCoreWebApi.BindingModels;
 using ASPNetCoreWebApi.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

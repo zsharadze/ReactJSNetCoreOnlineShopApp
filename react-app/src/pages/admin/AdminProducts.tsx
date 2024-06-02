@@ -92,7 +92,7 @@ const AdminProducts = () => {
                   <td
                     className={`${styles.adminProductsTableTd} ${styles.adminProductsTableTdPadding}`}
                   >
-                    {item.category.name}
+                    {item.categoryName}
                   </td>
                   <td
                     className={`${styles.adminProductsTableTd} ${styles.adminProductsTableTdPadding}`}
@@ -117,7 +117,7 @@ const AdminProducts = () => {
                   <td
                     className={`${styles.adminProductsTableTd} ${styles.adminProductsTableTdCenter}`}
                   >
-                    {item.orderItems.length}
+                    {item.ordersCount}
                   </td>
                   <td className={`${styles.adminProductsTableTd}`}>
                     <i

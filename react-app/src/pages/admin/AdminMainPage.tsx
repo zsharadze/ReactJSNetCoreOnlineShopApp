@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import AdminOrders from "./AdminOrders";
 import AdminProducts from "./AdminProducts";
 import AdminCategories from "./AdminCategories";
@@ -17,9 +17,13 @@ interface TabPanelProps {
 
 const AdminMain = () => {
   const [tabIndexValue, setTabIndexValue] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabIndexValue(newValue);
+    searchParams.set("tabIndex", newValue.toString());
+    setSearchParams(searchParams);
   };
+
   const search = useLocation().search;
 
   useEffect(() => {

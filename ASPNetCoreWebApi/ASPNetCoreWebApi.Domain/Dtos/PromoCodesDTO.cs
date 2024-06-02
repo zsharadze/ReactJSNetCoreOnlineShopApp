@@ -1,11 +1,11 @@
 ﻿using ASPNetCoreWebApi.Domain.Extensions;
 using ASPNetCoreWebApi.Domain.Models;
 
-namespace ASPNetCoreWebApi.Domain.ViewModels
+namespace ASPNetCoreWebApi.Domain.Dtos
 {
-    public class PromoCodesViewModel
+    public class PromoCodesDTO
     {
-        public List<PromoCode> PromoCodeList { get; set; }
+        public List<PromoCodeDTO> PromoCodeList { get; set; }
         public Pager Pager { get; set; }
     }
 }

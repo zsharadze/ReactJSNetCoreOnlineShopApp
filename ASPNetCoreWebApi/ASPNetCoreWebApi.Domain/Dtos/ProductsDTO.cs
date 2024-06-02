@@ -1,11 +1,11 @@
 ﻿using ASPNetCoreWebApi.Domain.Extensions;
 using ASPNetCoreWebApi.Domain.Models;
 
-namespace ASPNetCoreWebApi.Domain.ViewModels
+namespace ASPNetCoreWebApi.Domain.Dtos
 {
-    public class ProductsViewModel
+    public class ProductsDTO
     {
-        public List<Product> ProductList { get; set; }
+        public List<ProductDTO> ProductList { get; set; }
         public Pager Pager { get; set; }
     }
 }
