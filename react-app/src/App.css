@@ -225,3 +225,10 @@ a {
 .MuiButton-icon.MuiButton-endIcon{
   vertical-align: middle;
 }
+
+.quantityInputWrapperDiv{
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: left;
+  align-items: center;
+}
