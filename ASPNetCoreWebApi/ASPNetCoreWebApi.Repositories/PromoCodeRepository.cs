@@ -30,22 +30,25 @@ namespace ASPNetCoreWebApi.Repositories
 
         public async Task<bool> GeneratePromoCodes(int quantity, int discount)
         {
+            var newPromoCodesList = new List<PromoCode>();
             for (int i = 0; i < quantity; i++)
             {
                 PromoCode newPromoCode = new PromoCode();
                 newPromoCode.CreatedDate = DateTime.Now;
                 newPromoCode.Discount = discount;
                 newPromoCode.PromoCodeText = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
-                await _context.PromoCodes.AddAsync(newPromoCode);
+                newPromoCodesList.Add(newPromoCode);
+            }
 
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch
-                {
-                    return false;
-                }
+            await _context.PromoCodes.AddRangeAsync(newPromoCodesList);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
             }
 
             return true;
