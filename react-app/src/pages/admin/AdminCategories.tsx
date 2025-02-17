@@ -115,8 +115,8 @@ const AdminCategories = () => {
                           if (res.isConfirmed) {
                             categoryApi()
                               .delete(Number(item.id))
-                              .then((resDeleteCategory) => {                               
-                                if (!resDeleteCategory.data) {
+                              .then((resDeleteCategory) => {    
+                                if (!resDeleteCategory.data?.success) {
                                   Swal.fire({
                                     title: "Delete",
                                     text: "Can't delete category because there are products attached to it.",

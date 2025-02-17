@@ -124,7 +124,7 @@ namespace ASPNetCoreWebApi.Repositories
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
             return true;
         }

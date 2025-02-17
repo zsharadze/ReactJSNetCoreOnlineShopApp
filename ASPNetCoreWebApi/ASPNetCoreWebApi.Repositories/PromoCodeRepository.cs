@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ASPNetCoreWebApi.Repositories
 {
-    public class PromoCodeRepository : IPromoCodeRepository
+    public class PromoCodeRepository : IPromoCodeRepository, IAsyncDisposable
     {
         private readonly ApplicationDbContext _context;
 
@@ -128,6 +128,11 @@ namespace ASPNetCoreWebApi.Repositories
             }
 
             return true;
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return _context.DisposeAsync();
         }
     }
 }

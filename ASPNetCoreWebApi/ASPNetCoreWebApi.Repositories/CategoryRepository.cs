@@ -17,7 +17,7 @@ namespace ASPNetCoreWebApi.Repositories
 
         public async Task<int> Add(Category newItem)
         {
-            _context.Categories.Add(newItem);
+            await _context.Categories.AddAsync(newItem);
             try
             {
                 return await _context.SaveChangesAsync();

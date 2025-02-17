@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ASPNetCoreWebApi.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository : IOrderRepository, IAsyncDisposable
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
@@ -41,7 +41,7 @@ namespace ASPNetCoreWebApi.Repositories
                 }
             }
 
-            _context.Orders.Add(order);
+            await _context.Orders.AddAsync(order);
             try
             {
                 await _context.SaveChangesAsync();
@@ -50,7 +50,7 @@ namespace ASPNetCoreWebApi.Repositories
                 {
                     item.OrderId = order.Id;
                 }
-                _context.OrderItems.AddRange(orderItems);
+                await _context.OrderItems.AddRangeAsync(orderItems);
 
                 if (promoCodeEntity != null)
                 {
@@ -63,7 +63,7 @@ namespace ASPNetCoreWebApi.Repositories
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -192,6 +192,11 @@ namespace ASPNetCoreWebApi.Repositories
             order.IsShipped = true;
 
             return await _context.SaveChangesAsync();
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return _context.DisposeAsync();
         }
     }
 }
