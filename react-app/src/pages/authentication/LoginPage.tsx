@@ -127,6 +127,11 @@ const Login = ({ ...props }) => {
               onFocus={() => {
                 setPasswordInputFocusedFirstTime(true);
               }}
+              onKeyUp={event => {
+                if (event.key === 'Enter') {
+                  handleLogin()
+                }
+              }}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   "&.MuiInputBase-root fieldset": {

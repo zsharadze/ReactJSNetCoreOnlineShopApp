@@ -27,6 +27,7 @@ namespace ASPNetCoreWebApi.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login([FromBody] Login model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
@@ -67,6 +68,8 @@ namespace ASPNetCoreWebApi.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register([FromBody] Register model)
         {
             if (!_emailValidator.IsValidEmail(model.Email))
@@ -103,6 +106,7 @@ namespace ASPNetCoreWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePassword model)
         {
             if (model.NewPassword != model.ConfirmPassword)
