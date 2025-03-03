@@ -101,7 +101,7 @@ namespace ASPNetCoreWebApi.Repositories.Migrations
                     b.Property<string>("FaClass")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageSrc")
+                    b.Property<string>("ImageName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -131,9 +131,11 @@ namespace ASPNetCoreWebApi.Repositories.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Subtotal")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("SubtotalWithPromo")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UserId")
@@ -191,7 +193,7 @@ namespace ASPNetCoreWebApi.Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageSrc")
+                    b.Property<string>("ImageName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -200,6 +202,7 @@ namespace ASPNetCoreWebApi.Repositories.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");

@@ -15,10 +15,17 @@ namespace ASPNetCoreWebApi.Controllers
     {
         private readonly IProductService _productService;
         private readonly ImageFileSizeValidator _imageFileSizeValidator;
-        public ProductController(IProductService productService, ImageFileSizeValidator imageFileSizeValidator)
+        private readonly ImageSaver _imageSaver;
+        private readonly ImageDeleter _imageDeleter;
+        public ProductController(IProductService productService,
+            ImageFileSizeValidator imageFileSizeValidator,
+            ImageSaver imageSaver,
+            ImageDeleter imageDeleter)
         {
             _productService = productService;
             _imageFileSizeValidator = imageFileSizeValidator;
+            _imageSaver = imageSaver;
+            _imageDeleter = imageDeleter;
         }
 
         [HttpGet]
@@ -45,13 +52,14 @@ namespace ASPNetCoreWebApi.Controllers
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
         [ProducesResponseType(typeof(ApiResponse), 200)]
-        public async Task<IActionResult> Create([FromBody] ProductDTO product)
+        public async Task<IActionResult> Create([FromForm] ProductDTO product)
         {
-            var validImageSizeResult = _imageFileSizeValidator.IsValidSize(product.ImageSrc);
+            var validImageSizeResult = _imageFileSizeValidator.IsValidSize(product.ImageFile);
             if (!validImageSizeResult.Item1)
             {
                 return Ok(new ApiResponse() { Success = false, Message = validImageSizeResult.Item2 });
             }
+            product.ImageName = await _imageSaver.SaveImage(product.ImageFile, "images\\products");
 
             await _productService.Add(product);
             return Ok(new ApiResponse() { Success = true, Message = "" });
@@ -60,13 +68,27 @@ namespace ASPNetCoreWebApi.Controllers
         [HttpPut]
         [Authorize(Roles = UserRoles.Admin)]
         [ProducesResponseType(typeof(ApiResponse), 200)]
-        public async Task<IActionResult> Edit([FromBody] ProductDTO product)
+        public async Task<IActionResult> Edit([FromForm] ProductDTO product)
         {
-            var validImageSizeResult = _imageFileSizeValidator.IsValidSize(product.ImageSrc);
-            if (!validImageSizeResult.Item1)
+            var oldProduct = await _productService.GetById(product.Id);
+            if (oldProduct == null)
             {
-                return Ok(new ApiResponse() { Success = false, Message = validImageSizeResult.Item2 });
+                throw new Exception($"Product with id {product.Id} not found");
             }
+            string imageFileName = oldProduct.ImageName;
+
+            if (product.ImageFile != null)
+            {
+                var validImageSizeResult = _imageFileSizeValidator.IsValidSize(product.ImageFile);
+                if (!validImageSizeResult.Item1)
+                {
+                    return Ok(new ApiResponse() { Success = false, Message = validImageSizeResult.Item2 });
+                }
+
+                imageFileName = await _imageSaver.SaveImage(product.ImageFile, "images\\products");
+                _imageDeleter.DeleteImage(oldProduct.ImageName, "images\\products");                
+            }
+            product.ImageName = imageFileName;
 
             await _productService.Update(product);
             return Ok(new ApiResponse() { Success = true, Message = "" });
@@ -77,6 +99,13 @@ namespace ASPNetCoreWebApi.Controllers
         [ProducesResponseType(typeof(ApiResponse), 200)]
         public async Task<IActionResult> Delete(int id)
         {
+            var oldProduct = await _productService.GetById(id);
+            if (oldProduct == null)
+            {
+                throw new Exception($"Product with id {id} not found");
+            }
+            _imageDeleter.DeleteImage(oldProduct.ImageName, "images\\products");
+
             var success = await _productService.Remove(id);
             if (success)
                 return Ok(new ApiResponse() { Success = true, Message = "" });

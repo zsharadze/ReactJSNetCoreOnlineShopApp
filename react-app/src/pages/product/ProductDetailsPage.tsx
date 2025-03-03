@@ -27,6 +27,7 @@ function ProductDetails() {
   const [inputQuantity, setInputQuantity] = useState(1);
   const [showCheckoutButton, setShowCheckoutButton] = useState(false);
   const navigate = useNavigate();
+  const imagesUrl = process.env.REACT_APP_IMAGES_URL;
   const inputQuantityHandler = (
     event: any,
     value: number,
@@ -60,8 +61,8 @@ function ProductDetails() {
             <img
               className="detailsImg"
               src={
-                products?.product?.imageSrc
-                  ? "data:image/jpeg;base64," + products.product.imageSrc
+                products?.product?.imageName
+                  ?imagesUrl + "products/" + products.product.imageName
                   : ""
               }
               alt={products?.product?.name}

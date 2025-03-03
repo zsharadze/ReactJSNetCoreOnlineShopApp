@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace ASPNetCoreWebApi.Domain.Dtos
         public int Id { get; set; }
         public string Name { get; set; }
         public string FaClass { get; set; }//font awsome 4.7.0 class: "fa fa-desktop" for example
-        public string ImageSrc { get; set; }
+        public string ImageName { get; set; }
+        public IFormFile ImageFile { get; set; }
     }
 }

@@ -12,6 +12,7 @@ function ProductList() {
   const products = useSelector((state: RootState) => state.products);
   const loading = useSelector((state: RootState) => state.products.loading);
   const dispatch = useDispatch<any>();
+  const imagesUrl = process.env.REACT_APP_IMAGES_URL;
 
   useEffect(() => {
     dispatch(getProductsAsync());
@@ -35,7 +36,7 @@ function ProductList() {
                 <div className="product">
                   <div className="productItemImage">
                     <img
-                      src={"data:image/jpeg;base64," + item.imageSrc}
+                      src={imagesUrl + "products/" + item.imageName}
                       alt={item.name}
                     />
                   </div>

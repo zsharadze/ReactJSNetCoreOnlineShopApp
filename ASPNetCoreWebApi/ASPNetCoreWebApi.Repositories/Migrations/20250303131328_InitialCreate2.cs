@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ASPNetCoreWebApi.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,7 +59,7 @@ namespace ASPNetCoreWebApi.Repositories.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FaClass = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImageSrc = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ImageName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -180,8 +180,8 @@ namespace ASPNetCoreWebApi.Repositories.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsShipped = table.Column<bool>(type: "bit", nullable: false),
-                    Subtotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    SubtotalWithPromo = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Subtotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    SubtotalWithPromo = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PromoCodeId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -205,8 +205,8 @@ namespace ASPNetCoreWebApi.Repositories.Migrations
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ImageSrc = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ImageName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>

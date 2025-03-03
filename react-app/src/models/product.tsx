@@ -6,7 +6,7 @@ export interface Product {
   name?: string;
   description?: string;
   price?: number;
-  imageSrc?: string;
+  imageName?: string;
   createdDate?: Date;
   category?: Category;
 }

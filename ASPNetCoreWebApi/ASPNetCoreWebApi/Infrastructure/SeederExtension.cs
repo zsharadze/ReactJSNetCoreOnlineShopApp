@@ -46,7 +46,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     desktop1.Name = "i3 10100";
                     desktop1.Description = "RAM: 8GB, SSD: 256GB, GPU: GTX 1050, PSU: 500w";
                     desktop1.Price = 400;
-                    desktop1.ImageSrc = Properties.Resources.Desktop1Base64Image;
+                    desktop1.ImageName = "Desktop1.jpg";
                     desktop1.CreatedDate = DateTime.Now;
                     context.Products.Add(desktop1);
 
@@ -56,7 +56,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     desktop2.Name = "Intel Core i3-10100f";
                     desktop2.Description = "RAM: 16GB, SSD: 500GB, GPU: GTX 1070 , PSU: 700w";
                     desktop2.Price = 800;
-                    desktop2.ImageSrc = Properties.Resources.Desktop2Base64Image;
+                    desktop2.ImageName = "Desktop2.jpg";
                     desktop2.CreatedDate = DateTime.Now;
                     context.Products.Add(desktop2);
 
@@ -65,7 +65,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     desktop3.Name = "Intel Core i5-11600K";
                     desktop3.Description = "RAM: 32GB, SSD: 500GB, GPU: GTX 1080 TI , PSU: 850w";
                     desktop3.Price = 1000;
-                    desktop3.ImageSrc = Properties.Resources.Desktop3Base64Image;
+                    desktop3.ImageName = "Desktop3.jpg";
                     desktop3.CreatedDate = DateTime.Now;
                     context.Products.Add(desktop3);
 
@@ -74,7 +74,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     desktop4.Name = "Intel Core i3-9100f";
                     desktop4.Description = "RAM: 16GB, SSD: 120GB, HDD: 500GB, GPU: GTX 1050 TI , PSU: 650w";
                     desktop4.Price = 700;
-                    desktop4.ImageSrc = Properties.Resources.Desktop4Base64Image;
+                    desktop4.ImageName = "Desktop4.jpg";
                     desktop4.CreatedDate = DateTime.Now;
                     context.Products.Add(desktop4);
 
@@ -83,7 +83,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     desktop5.Name = "AMD Ryzen 9 5900X";
                     desktop5.Description = "RAM: 64GB, SSD: 2TB, HDD: 2TB, GPU: RX 6700 XT , PSU: 1200w";
                     desktop5.Price = 2000;
-                    desktop5.ImageSrc = Properties.Resources.Desktop5Base64Image;
+                    desktop5.ImageName = "Desktop5.jpg";
                     desktop5.CreatedDate = DateTime.Now;
                     context.Products.Add(desktop5);
                     //
@@ -94,7 +94,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     laptop1.Name = "i7-11370H";
                     laptop1.Description = "RAM: 32GB, SSD: 500GB, GPU: NVIDA GeForce MX450, Display: 15.6 Inch";
                     laptop1.Price = 870;
-                    laptop1.ImageSrc = Properties.Resources.Laptop1Base64Image;
+                    laptop1.ImageName = "Laptop1.jpg";
                     laptop1.CreatedDate = DateTime.Now;
                     context.Products.Add(laptop1);
 
@@ -103,7 +103,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     laptop2.Name = "AMD Ryzen 5 5600H";
                     laptop2.Description = "RAM: 16GB, SSD: 256GB, GPU: NVIDIA GeForce GTX 1650, Display: 15.6 Inch";
                     laptop2.Price = 700;
-                    laptop2.ImageSrc = Properties.Resources.Laptop2Base64Image;
+                    laptop2.ImageName = "Laptop2.jpg";
                     laptop2.CreatedDate = DateTime.Now;
                     context.Products.Add(laptop2);
 
@@ -112,7 +112,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     laptop3.Name = "Intel Core i5-10300H";
                     laptop3.Description = "RAM: 8GB, SSD: 256GB, GPU: GeForce RTX 3050, Display: 15.6 Inch";
                     laptop3.Price = 1100;
-                    laptop3.ImageSrc = Properties.Resources.Laptop3Base64Image;
+                    laptop3.ImageName = "Laptop3.jpg";
                     laptop3.CreatedDate = DateTime.Now;
                     context.Products.Add(laptop3);
 
@@ -121,7 +121,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     laptop4.Name = "Intel Core i5-1035G1";
                     laptop4.Description = "RAM: 16GB, SSD: 500GB, GPU: Integrated, Display: 14 Inch";
                     laptop4.Price = 1100;
-                    laptop4.ImageSrc = Properties.Resources.Laptop4Base64Image;
+                    laptop4.ImageName = "Laptop4.jpg";
                     laptop4.CreatedDate = DateTime.Now;
                     context.Products.Add(laptop4);
 
@@ -130,7 +130,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     laptop5.Name = "Intel Core i5-10210U";
                     laptop5.Description = "RAM: 8GB, SSD: 256GB, GPU: Integrated, Display: 13 Inch";
                     laptop5.Price = 1100;
-                    laptop5.ImageSrc = Properties.Resources.Laptop5Base64Image;
+                    laptop5.ImageName = "Laptop5.jpg";
                     laptop5.CreatedDate = DateTime.Now;
                     context.Products.Add(laptop5);
                     //
@@ -141,7 +141,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     tablet1.Name = "Tablet 10.1";
                     tablet1.Description = "RAM: 3GB, Storage: 32GB, Battery: 12 Hour, Display: 10.1 Inch";
                     tablet1.Price = 255;
-                    tablet1.ImageSrc = Properties.Resources.Tablet1Base64Image;
+                    tablet1.ImageName = "Tablet1.jpg";
                     tablet1.CreatedDate = DateTime.Now;
                     context.Products.Add(tablet1);
 
@@ -150,7 +150,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     tablet2.Name = "Tablet 7";
                     tablet2.Description = "RAM: 1.5GB, Storage: 16GB, Battery: 6 Hour, Display: 7 Inch";
                     tablet2.Price = 150;
-                    tablet2.ImageSrc = Properties.Resources.Tablet2Base64Image;
+                    tablet2.ImageName = "Tablet2.jpg";
                     tablet2.CreatedDate = DateTime.Now;
                     context.Products.Add(tablet2);
 
@@ -159,7 +159,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     tablet3.Name = "Tablet 10.0";
                     tablet3.Description = "RAM: 1GB, Storage: 8GB, Battery: 4 Hour, Display: 10.0 Inch";
                     tablet3.Price = 200;
-                    tablet3.ImageSrc = Properties.Resources.Tablet3Base64Image;
+                    tablet3.ImageName = "Tablet3.jpg";
                     tablet3.CreatedDate = DateTime.Now;
                     context.Products.Add(tablet3);
 
@@ -168,7 +168,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     tablet4.Name = "Tablet 11.6";
                     tablet4.Description = "RAM: 4GB, Storage: 64GB, Battery: 10 Hour, Display: 11.6 Inch";
                     tablet4.Price = 310;
-                    tablet4.ImageSrc = Properties.Resources.Tablet4Base64Image;
+                    tablet4.ImageName = "Tablet4.jpg";
                     tablet4.CreatedDate = DateTime.Now;
                     context.Products.Add(tablet4);
 
@@ -177,7 +177,7 @@ namespace ASPNetCoreWebApi.Infrastructure
                     tablet5.Name = "Tablet 8";
                     tablet5.Description = "RAM: 4GB, Storage: 64GB, Battery: 8 Hour, Display: 8 Inch";
                     tablet5.Price = 270;
-                    tablet5.ImageSrc = Properties.Resources.Tablet5Base64Image;
+                    tablet5.ImageName = "Tablet5.jpg";
                     tablet5.CreatedDate = DateTime.Now;
                     context.Products.Add(tablet5);
                     //

@@ -61,7 +61,7 @@ namespace ASPNetCoreWebApi.Repositories
                 transaction.Commit();
                 return result;
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -100,7 +100,7 @@ namespace ASPNetCoreWebApi.Repositories
                             CategoryId = ot.Product.CategoryId,
                             CreatedDate = ot.Product.CreatedDate,
                             Description = ot.Product.Description,
-                            ImageSrc = ot.Product.ImageSrc,
+                            ImageName = ot.Product.ImageName,
                             Name = ot.Product.Name,
                             Price = ot.Product.Price
                         },
@@ -155,7 +155,7 @@ namespace ASPNetCoreWebApi.Repositories
                             CategoryId = ot.Product.CategoryId,
                             CreatedDate = ot.Product.CreatedDate,
                             Description = ot.Product.Description,
-                            ImageSrc = ot.Product.ImageSrc,
+                            ImageName = ot.Product.ImageName,
                             Name = ot.Product.Name,
                             Price = ot.Product.Price
                         },

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASPNetCoreWebApi.Domain.Models
@@ -8,7 +9,9 @@ namespace ASPNetCoreWebApi.Domain.Models
         public int Id { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsShipped { get; set; }
+        [Precision(18, 2)]
         public decimal Subtotal { get; set; }
+        [Precision(18, 2)]
         public decimal? SubtotalWithPromo { get; set; }
         public string UserId { get; set; }
         [NotMapped]

@@ -33,10 +33,13 @@ const AdminAddEditProduct = () => {
     useState(false);
   const [categoryId, setCategoryId] = useState<number>(0);
   const [categoryList, setCategoryList] = useState<Category[]>();
-  const [imageSrc, setImageSrc] = useState<string>();
+  const [imageName, setImageName] = useState<string>();
+  const [imagePreviewSrc, setImagePreviewSrc] = useState<string>();
+  const [imageFile, setImageFile] = useState();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
+  const imagesUrl = process.env.REACT_APP_IMAGES_URL;
 
   useEffect(() => {
     let id = params?.id;
@@ -51,7 +54,7 @@ const AdminAddEditProduct = () => {
           setCategoryId(res.data.categoryId);
           setDescription(res.data.description);
           setPrice(res.data.price);
-          setImageSrc(res.data.imageSrc);
+          setImageName(res.data.imageName);
         });
     }
     setLoading(true);
@@ -72,6 +75,7 @@ const AdminAddEditProduct = () => {
 
   const setAddEditProductImageFile = (event: any) => {
     if (event.target.files && event.target.files[0]) {
+      setImageFile(event.target.files[0]);
       let reader = new FileReader();
       reader.readAsDataURL(event.target.files[0]);
       reader.onload = () => {
@@ -80,7 +84,7 @@ const AdminAddEditProduct = () => {
           .replace("data:image/png;base64,", "")
           .replace("data:image/jpeg;base64,", "")
           .replace("data:image/gif;base64,", "");
-        setImageSrc(base64Str);
+          setImagePreviewSrc(base64Str);
       };
       reader.onerror = function (error) {
         console.log("Error: ", error);
@@ -96,7 +100,7 @@ const AdminAddEditProduct = () => {
         icon: "error",
       });
       return;
-    } else if (!imageSrc) {
+    } else if (!imageFile && !productId) {
       Swal.fire({
         title: "Error",
         text: "Please upload image",
@@ -104,19 +108,21 @@ const AdminAddEditProduct = () => {
       });
       return;
     }
-    let productToAdd: Product = {
-      id: productId ?? 0,
-      name: name,
-      categoryId: categoryId,
-      description: description,
-      price: Number(price),
-      imageSrc: imageSrc,
-    };
+
+    const formData = new FormData();
+        formData.append("id", productId?.toString() ?? "0");
+        formData.append("name", name);
+        formData.append("categoryId", categoryId?.toString());
+        formData.append("description", description);
+        formData.append("price", price);
+        if (imageFile) {
+          formData.set("imageFile", imageFile);
+        }
 
     if (!productId) {
       setLoading(true);
       productApi()
-        .create(productToAdd)
+        .create(formData)
         .then((res) => {
           setLoading(false);    
           if (!res.data.success) {
@@ -132,7 +138,7 @@ const AdminAddEditProduct = () => {
     } else {
       setLoading(true);
       productApi()
-        .update(productToAdd)
+        .update(formData)
         .then((res) => {
           setLoading(false);
           if (!res.data.success) {
@@ -279,9 +285,9 @@ const AdminAddEditProduct = () => {
         />
       </Box>
       <img
-        style={{ display: imageSrc ? "" : "none" }}
+        style={{ display: (imagePreviewSrc || imageName) ? "" : "none" }}
         className={`${styles.addProductShowImg}`}
-        src={imageSrc ? "data:image/jpeg;base64," + imageSrc : ""}
+        src={imagePreviewSrc ? "data:image/jpeg;base64," + imagePreviewSrc :  (imageName ? imagesUrl + "products/" + imageName : "")}
         alt="productImage"
       />
       <Box sx={{ marginTop: "15px" }}>

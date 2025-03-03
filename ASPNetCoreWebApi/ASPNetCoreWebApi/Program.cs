@@ -53,6 +53,8 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
 builder.Services.AddScoped<ImageFileSizeValidator>();
 builder.Services.AddScoped<EmailValidator>();
+builder.Services.AddScoped<ImageSaver>();
+builder.Services.AddScoped<ImageDeleter>();
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddRoles<IdentityRole>()
@@ -112,6 +114,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -66,7 +66,7 @@ namespace ASPNetCoreWebApi.Repositories
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    ImageSrc = p.ImageSrc,
+                    ImageName = p.ImageName,
                     Price = p.Price,
                     CategoryName = p.Category.Name,
                     OrdersCount = p.OrderItems.Count()
@@ -86,7 +86,7 @@ namespace ASPNetCoreWebApi.Repositories
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    ImageSrc = p.ImageSrc,
+                    ImageName = p.ImageName,
                     Price = p.Price
                 })
                 .ToListAsync();
@@ -122,7 +122,7 @@ namespace ASPNetCoreWebApi.Repositories
                     transaction.Commit();
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }

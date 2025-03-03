@@ -11,6 +11,7 @@ const AdminOrders = () => {
   const [orders, setOrders] = useState<any>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const imagesUrl = process.env.REACT_APP_IMAGES_URL;
 
   useEffect(() => {   
     getOrders();
@@ -50,7 +51,7 @@ const AdminOrders = () => {
           >
             <img
               className="orderItemProductImg"
-              src={"data:image/jpeg;base64," + element?.product?.imageSrc}
+              src={imagesUrl + "products/" + element?.product?.imageName}
               alt={element.productId?.toString()}
               style={{ cursor: "pointer" }}
             />

@@ -34,7 +34,8 @@ function ShoppingCart() {
   const [promoCodeDiscount, setPromoCodeDiscount] = useState<number>();
   const navigate = useNavigate();
   const auth = useSelector((state: RootState) => state.auth);
-
+  const imagesUrl = process.env.REACT_APP_IMAGES_URL;
+  
   useEffect(() => {
     let allAddedProductIds: number[] = [];
     if (shoppingCart.shoppingCart.length > 0) {
@@ -183,8 +184,8 @@ function ShoppingCart() {
                               <img
                                 className="shoppingCartProductImg"
                                 src={
-                                  item?.imageSrc
-                                    ? "data:image/jpeg;base64," + item.imageSrc
+                                  item?.imageName
+                                    ? imagesUrl + "products/" + item.imageName
                                     : ""
                                 }
                                 alt={item.name}

@@ -12,6 +12,7 @@ const AdminCategories = () => {
   const [categories, setCategories] = useState<any>();
   const navigate = useNavigate();
   const pageSize = 10;
+  const imagesUrl = process.env.REACT_APP_IMAGES_URL;
 
   useEffect(() => {
     getCategories();
@@ -88,10 +89,10 @@ const AdminCategories = () => {
                     style={{ maxWidth: "100px", maxHeight: "100px" }}
                     className={`${styles.adminCategoriesTableTd}`}
                   >
-                    {item.imageSrc && (
+                    {item.imageName && (
                       <img
                         className={`${styles.categoryImgAdmin}`}
-                        src={"data:image/jpeg;base64," + item.imageSrc}
+                        src={imagesUrl + "categories/" + item.imageName}
                         alt={item.name}
                       />
                     )}

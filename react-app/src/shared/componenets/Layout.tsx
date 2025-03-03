@@ -48,7 +48,8 @@ export default function Layout({ children, ...props }: any) {
   const location = useLocation();
   const [selectedCategoryId, setSelectedCategoryId] = React.useState<number>();
   const shoppingCart = useSelector((state: RootState) => state.shoppingCart);
-
+  const imagesUrl = process.env.REACT_APP_IMAGES_URL;
+  
   React.useEffect(() => {
     dispatch(getCategoriesAsync(undefined, undefined, undefined));
   }, []);
@@ -131,10 +132,10 @@ export default function Layout({ children, ...props }: any) {
                       <Box ml={2}>{item.name}</Box>
                     </>
                   )}
-                  {item.imageSrc && (
+                  {item.imageName && (
                     <>
                       <img
-                        src={"data:image/jpeg;base64," + item.imageSrc}
+                        src={imagesUrl + "categories/" + item.imageName}
                         style={{ border: "1", width: "40px", height: "40px" }}
                         alt="productImage"
                       />{" "}

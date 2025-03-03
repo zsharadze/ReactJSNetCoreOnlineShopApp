@@ -11,7 +11,8 @@ const AdminProducts = () => {
   const [products, setProducts] = useState<any>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-
+  const imagesUrl = process.env.REACT_APP_IMAGES_URL;
+  
   useEffect(() => {
     getProducts();
   }, []);
@@ -85,7 +86,7 @@ const AdminProducts = () => {
                   >
                     <img
                       className={`${styles.productImgAdmin}`}
-                      src={"data:image/jpeg;base64," + item.imageSrc}
+                      src={imagesUrl + "products/" + item.imageName}
                       alt={item.name}
                     />
                   </td>

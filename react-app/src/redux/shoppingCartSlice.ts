@@ -8,7 +8,7 @@ type ShoppingCartItem = {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
-  imageSrc: string;
+  imageName: string;
 };
 
 type State = {
@@ -57,8 +57,8 @@ const shoppingCartSlice = createSlice({
             state.shoppingCart[foundIndex].unitPrice = action.payload[k].price;
             state.shoppingCart[foundIndex].totalPrice =
               state.shoppingCart[foundIndex].quantity * action.payload[k].price;
-            state.shoppingCart[foundIndex].imageSrc =
-              action.payload[k].imageSrc;
+            state.shoppingCart[foundIndex].imageName =
+              action.payload[k].imageName;
           }
         }
       }
@@ -106,7 +106,7 @@ export const getProductsAndAddToStateAsync =
             productObj.name = result.data[index].name;
             productObj.description = result.data[index].description;
             productObj.price = result.data[index].price;
-            productObj.imageSrc = result.data[index].imageSrc;
+            productObj.imageName = result.data[index].imageName;
             productArrayToAdd.push(productObj);
           }
           dispatch(addOrUpdateCartPassingArray(productArrayToAdd));

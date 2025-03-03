@@ -29,15 +29,22 @@ export const productApi = () => {
       ),
     getById: (id: any) => axios.get(url + "details/?id=" + id),
     getByIds: (ids: number[]) => axios.post(url + "getallbyids", ids),
-    create: (newRecord: Product) => {
+    create: (newRecord: FormData) => {
       return axios({
         method: "post",
         url: url + "create",
         data: newRecord,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "multipart/form-data" },
       });
     },
-    update: (updateRecord: Product) => axios.put(url + "edit", updateRecord),
+    update: (updateRecord: FormData) => {
+      return axios({
+        method: "put",
+        url: url + "edit",
+        data: updateRecord,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    },
     delete: (id: any) => axios.delete(url + "delete/?id=" + id),
   };
 };
@@ -58,8 +65,22 @@ export const categoryApi = () => {
           }&searchText=${searchText ? searchText : ""}`
       ),
     getById: (id: number) => axios.get(url + "details/?id=" + id),
-    create: (newRecord: Category) => axios.post(url + "create", newRecord),
-    update: (updateRecord: Category) => axios.put(url + "edit", updateRecord),
+    create: (newRecord: FormData) => {
+      return axios({
+        method: "post",
+        url: url + "create",
+        data: newRecord,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    },
+    update: (updateRecord: FormData) => {
+      return axios({
+        method: "put",
+        url: url + "edit",
+        data: updateRecord,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    },
     delete: (id: number) => axios.delete(url + "delete/?id=" + id),
   };
 };

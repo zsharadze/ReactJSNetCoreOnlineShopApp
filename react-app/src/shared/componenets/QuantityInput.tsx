@@ -4,7 +4,7 @@ export default function QuantityInput(props: any) {
   return (
     <div className="quantityInputWrapperDiv">
       <TextField
-        inputProps={{ minLength: 1, maxLength: 100000 }}
+        inputProps={{ min: 1, max: 100000 }}
         size="small"
         type="number"
         style={{ width: 100 }}

@@ -20,11 +20,14 @@ const AdminAddEditCategory = () => {
     setFontAwsomeClassNameInputFocusedFirstTime,
   ] = useState(false);
   const [categoryId, setCategoryId] = useState<number>(0);
-  const [imageSrc, setImageSrc] = useState<string>();
+  const [imageName, setImageName] = useState<string>();
+  const [imagePreviewSrc, setImagePreviewSrc] = useState<string>();
+  const [imageFile, setImageFile] = useState();
   const [loading, setLoading] = useState(false);
   const [fontAwsomeOrImage, setFontAwsomeOrImage] = useState("fontAwsome");
   const navigate = useNavigate();
   const params = useParams();
+  const imagesUrl = process.env.REACT_APP_IMAGES_URL;
 
   useEffect(() => {
     let id = params?.id;
@@ -36,8 +39,8 @@ const AdminAddEditCategory = () => {
         .then((res) => {
           setLoading(false);
           setName(res.data.name);
-          setFontAwsomeClassName(res.data.faClass);
-          setImageSrc(res.data.imageSrc);
+          setFontAwsomeClassName(res.data.faClass ?? '');
+          setImageName(res.data.imageName);
           if (!res.data.faClass) {
             setFontAwsomeOrImage("image");
           }
@@ -47,6 +50,7 @@ const AdminAddEditCategory = () => {
 
   const setAddEditCategoryImageFile = (event: any) => {
     if (event.target.files && event.target.files[0]) {
+      setImageFile(event.target.files[0]);
       let reader = new FileReader();
       reader.readAsDataURL(event.target.files[0]);
       reader.onload = () => {
@@ -55,7 +59,7 @@ const AdminAddEditCategory = () => {
           .replace("data:image/png;base64,", "")
           .replace("data:image/jpeg;base64,", "")
           .replace("data:image/gif;base64,", "");
-        setImageSrc(base64Str);
+          setImagePreviewSrc(base64Str);
       };
       reader.onerror = function (error) {
         console.log("Error: ", error);
@@ -73,7 +77,9 @@ const AdminAddEditCategory = () => {
   const onFontAwsomeAndImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setImageSrc("");
+    setImageName("");
+    setImagePreviewSrc("");
+    setImageFile(undefined);
     setFontAwsomeClassName("");
     setFontAwsomeOrImage((event.target as HTMLInputElement).value);
   };
@@ -86,7 +92,7 @@ const AdminAddEditCategory = () => {
         icon: "error",
       });
       return;
-    } else if (fontAwsomeOrImage === "image" && !imageSrc) {
+    } else if (fontAwsomeOrImage === "image" && !imageFile && !imageName) {
       Swal.fire({
         title: "Error",
         text: "Please upload image",
@@ -95,17 +101,19 @@ const AdminAddEditCategory = () => {
       return;
     }
 
-    let categoryToAdd: Category = {
-      id: categoryId ?? 0,
-      name: name,
-      faClass: fontAwsomeClassName,
-      imageSrc: imageSrc,
-    };
-
+    const formData = new FormData();
+    formData.append("id", categoryId?.toString() ?? "0");
+    formData.append("name", name);
+    formData.append("faClass", fontAwsomeClassName);
+    formData.append("imageName", imageName!?.toString());
+    if (imageFile) {
+      formData.set("imageFile", imageFile);
+    }
+    
     if (!categoryId) {
       setLoading(true);
       categoryApi()
-        .create(categoryToAdd)
+        .create(formData)
         .then((res) => {
           setLoading(false);          
           if (!res.data.success) {
@@ -121,7 +129,7 @@ const AdminAddEditCategory = () => {
     } else {
       setLoading(true);
       categoryApi()
-        .update(categoryToAdd)
+        .update(formData)
         .then((res) => {
           setLoading(false);
           if (!res.data.success) {
@@ -203,9 +211,9 @@ const AdminAddEditCategory = () => {
           onChange={(e) => setAddEditCategoryImageFile(e)}
         />
         <img
-          style={{ display: imageSrc ? "" : "none" }}
+          style={{ display: (imagePreviewSrc || imageName) ? "" : "none" }}
           className={`${styles.addProductShowImg}`}
-          src={imageSrc ? "data:image/jpeg;base64," + imageSrc : ""}
+         src={imagePreviewSrc ? "data:image/jpeg;base64," + imagePreviewSrc :  (imageName ? imagesUrl + "categories/" + imageName : "")}
           alt="productImage"
         />
       </Box>

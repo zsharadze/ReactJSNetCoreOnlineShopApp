@@ -38,7 +38,7 @@ namespace ASPNetCoreWebApi.Repositories
                 Id = c.Id,
                 Name = c.Name,
                 FaClass = c.FaClass,
-                ImageSrc = c.ImageSrc,
+                ImageName = c.ImageName,
                 ProductsCount = c.Products.Count
             }).AsQueryable();
             string summaryTextAdd = "";

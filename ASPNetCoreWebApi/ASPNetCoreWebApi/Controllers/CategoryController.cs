@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ASPNetCoreWebApi.Domain.Models;
 using AutoMapper;
+using ASPNetCoreWebApi.Domain.Services;
 
 namespace ASPNetCoreWebApi.Controllers
 {
@@ -15,13 +16,19 @@ namespace ASPNetCoreWebApi.Controllers
     {
         private readonly ICategoryService _categoryService;
         private readonly ImageFileSizeValidator _imageFileSizeValidator;
+        private readonly ImageSaver _imageSaver;
+        private readonly ImageDeleter _imageDeleter;
 
         public CategoryController(ICategoryService categoryService,
             ImageFileSizeValidator imageFileSizeValidator,
-            IMapper mapper)
+            IMapper mapper,
+            ImageSaver imageSaver,
+            ImageDeleter imageDeleter)
         {
             _categoryService = categoryService;
             _imageFileSizeValidator = imageFileSizeValidator;
+            _imageSaver = imageSaver;
+            _imageDeleter = imageDeleter;
         }
 
         [HttpGet]
@@ -41,21 +48,25 @@ namespace ASPNetCoreWebApi.Controllers
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
         [ProducesResponseType(typeof(ApiResponse), 200)]
-        public async Task<IActionResult> Create([FromBody] CategoryDTO category)
+        public async Task<IActionResult> Create([FromForm] CategoryDTO category)
         {
-            if (string.IsNullOrEmpty(category.FaClass) && string.IsNullOrEmpty(category.ImageSrc))
+
+            if (string.IsNullOrEmpty(category.FaClass) && category.ImageFile == null && string.IsNullOrEmpty(category.ImageName))
             {
-                throw new Exception("FaClass and ImageSrc both can't be null");
+                throw new Exception("FaClass and ImageFile both can't be null");
             }
 
-            if (!string.IsNullOrEmpty(category.ImageSrc))
+            if (category.ImageFile != null)
             {
-                var validImageSizeResult = _imageFileSizeValidator.IsValidSize(category.ImageSrc);
+                var validImageSizeResult = _imageFileSizeValidator.IsValidSize(category.ImageFile);
                 if (!validImageSizeResult.Item1)
                 {
                     return Ok(new ApiResponse() { Success = false, Message = validImageSizeResult.Item2 });
                 }
             }
+
+            category.ImageName = await _imageSaver.SaveImage(category.ImageFile, "images\\categories");
+
             await _categoryService.Add(category);
             return Ok(new ApiResponse() { Success = true, Message = "" });
         }
@@ -63,16 +74,39 @@ namespace ASPNetCoreWebApi.Controllers
         [HttpPut]
         [Authorize(Roles = UserRoles.Admin)]
         [ProducesResponseType(typeof(ApiResponse), 200)]
-        public async Task<IActionResult> Edit([FromBody] CategoryDTO category)
+        public async Task<IActionResult> Edit([FromForm] CategoryDTO category)
         {
-            if (!string.IsNullOrEmpty(category.ImageSrc))
+            if (string.IsNullOrEmpty(category.FaClass) && category.ImageFile == null && string.IsNullOrEmpty(category.ImageName))
             {
-                var validImageSizeResult = _imageFileSizeValidator.IsValidSize(category.ImageSrc);
+                throw new Exception("FaClass and ImageFile both can't be null");
+            }
+
+            var oldCategory = await _categoryService.GetById(category.Id);
+            if (oldCategory == null)
+            {
+                throw new Exception($"Category with id {category.Id} not found");
+            }
+            string imageFileName = oldCategory.ImageName;
+
+            if (category.ImageFile != null)
+            {
+                var validImageSizeResult = _imageFileSizeValidator.IsValidSize(category.ImageFile);
                 if (!validImageSizeResult.Item1)
                 {
                     return Ok(new ApiResponse() { Success = false, Message = validImageSizeResult.Item2 });
                 }
+
+                imageFileName = await _imageSaver.SaveImage(category.ImageFile, "images\\categories");
+                _imageDeleter.DeleteImage(oldCategory.ImageName, "images\\categories");
             }
+
+            if (!string.IsNullOrEmpty(category.FaClass))
+            {
+                _imageDeleter.DeleteImage(oldCategory.ImageName, "images\\categories");
+                imageFileName = null;
+            }
+            category.ImageName = imageFileName;
+
             await _categoryService.Update(category);
             return Ok(new ApiResponse() { Success = true, Message = "" });
         }
@@ -82,6 +116,13 @@ namespace ASPNetCoreWebApi.Controllers
         [ProducesResponseType(typeof(ApiResponse), 200)]
         public async Task<IActionResult> Delete(int id)
         {
+            var oldCategory = await _categoryService.GetById(id);
+            if (oldCategory == null)
+            {
+                throw new Exception($"Category with id {id} not found");
+            }
+            _imageDeleter.DeleteImage(oldCategory.ImageName, "images\\categories");
+
             var success = await _categoryService.Remove(id);
             if (success)
                 return Ok(new ApiResponse() { Success = true, Message = "" });
