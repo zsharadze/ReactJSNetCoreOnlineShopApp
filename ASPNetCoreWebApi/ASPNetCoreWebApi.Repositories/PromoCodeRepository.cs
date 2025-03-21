@@ -3,16 +3,20 @@ using ASPNetCoreWebApi.Domain.Models;
 using ASPNetCoreWebApi.Domain.Repositories;
 using ASPNetCoreWebApi.Domain.Dtos;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper.QueryableExtensions;
+using AutoMapper;
 
 namespace ASPNetCoreWebApi.Repositories
 {
     public class PromoCodeRepository : IPromoCodeRepository, IAsyncDisposable
     {
         private readonly ApplicationDbContext _context;
-
-        public PromoCodeRepository(ApplicationDbContext context)
+        private readonly IMapper _mapper;
+        public PromoCodeRepository(ApplicationDbContext context,
+            IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _mapper = mapper;
         }
 
         public async Task<int> Add(PromoCode newItem)
@@ -85,16 +89,8 @@ namespace ASPNetCoreWebApi.Repositories
             result.Pager = pagerHelper.GetPager;
             result.PromoCodeList = await promoCodes.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize)
                 .Take(pagerHelper.PageSize)
-                .Select(x => new PromoCodeDTO
-                {
-                    CreatedDate = x.CreatedDate,
-                    Discount = x.Discount,
-                    Id = x.Id,
-                    IsUsed = x.IsUsed,
-                    PromoCodeText = x.PromoCodeText,
-                    UsedOnOrderId = x.Order.Id,
-                    UsedByUserEmail = x.Order.User.Email
-                }).ToListAsync();
+                .ProjectTo<PromoCodeDTO>(_mapper.ConfigurationProvider)
+                .ToListAsync();
             return result;
         }
 

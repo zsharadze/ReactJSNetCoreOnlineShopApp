@@ -4,18 +4,56 @@ using ASPNetCoreWebApi.Domain.Repositories;
 using ASPNetCoreWebApi.Domain.Dtos;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace ASPNetCoreWebApi.Repositories
 {
     public class OrderRepository : IOrderRepository, IAsyncDisposable
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
+        private Expression<Func<Order, OrderForListDto>> OrderListExpression = x =>
+                 new OrderForListDto
+                 {
+                     Id = x.Id,
+                     CreatedDate = x.CreatedDate,
+                     IsShipped = x.IsShipped,
+                     PromoCodeId = x.PromoCodeId,
+                     OrderItems = x.OrderItems.Select(ot => new OrderItemDTO()
+                     {
+                         Id = ot.Id,
+                         ProductId = ot.ProductId,
+                         Product = new ProductDTO()
+                         {
+                             Id = ot.Product.Id,
+                             CategoryId = ot.Product.CategoryId,
+                             CreatedDate = ot.Product.CreatedDate,
+                             Description = ot.Product.Description,
+                             ImageName = ot.Product.ImageName,
+                             Name = ot.Product.Name,
+                             Price = ot.Product.Price
+                         },
+                         Quantity = ot.Quantity
+                     }).ToList(),
+                     PromoCode = x.PromoCode == null ? null : new PromoCodeDTO()
+                     {
+                         Id = x.PromoCode.Id,
+                         CreatedDate = x.PromoCode.CreatedDate,
+                         Discount = x.PromoCode.Discount,
+                         IsUsed = x.PromoCode.IsUsed,
+                         PromoCodeText = x.PromoCode.PromoCodeText,
+                         UsedByUserEmail = x.PromoCode.UsedByUserEmail,
+                         UsedOnOrderId = x.PromoCode.OrderId,
+                     },
+                     Subtotal = x.Subtotal,
+                     SubtotalWithPromo = x.SubtotalWithPromo,
+                     UserEmail = x.User.Email,
+                     UserId = x.UserId
+                 };
 
-        public OrderRepository(ApplicationDbContext context, IMapper mapper)
+
+        public OrderRepository(ApplicationDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _mapper = mapper;
         }
 
         public async Task<int> CreateOrder(List<OrderItem> orderItems, string promoCode, decimal subTotal, string userId)
@@ -84,43 +122,7 @@ namespace ASPNetCoreWebApi.Repositories
 
             result.OrderList = await orders.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize)
                 .Take(pagerHelper.PageSize)
-                .Select(x => new OrderForListDto()
-                {
-                    Id = x.Id,
-                    CreatedDate = x.CreatedDate,
-                    IsShipped = x.IsShipped,
-                    PromoCodeId = x.PromoCodeId,
-                    OrderItems = x.OrderItems.Select(ot => new OrderItemDTO()
-                    {
-                        Id = ot.Id,
-                        ProductId = ot.ProductId,
-                        Product = new ProductDTO()
-                        {
-                            Id = ot.Product.Id,
-                            CategoryId = ot.Product.CategoryId,
-                            CreatedDate = ot.Product.CreatedDate,
-                            Description = ot.Product.Description,
-                            ImageName = ot.Product.ImageName,
-                            Name = ot.Product.Name,
-                            Price = ot.Product.Price
-                        },
-                        Quantity = ot.Quantity
-                    }).ToList(),
-                    PromoCode = x.PromoCode == null ? null : new PromoCodeDTO()
-                    {
-                        Id = x.PromoCode.Id,
-                        CreatedDate = x.PromoCode.CreatedDate,
-                        Discount = x.PromoCode.Discount,
-                        IsUsed = x.PromoCode.IsUsed,
-                        PromoCodeText = x.PromoCode.PromoCodeText,
-                        UsedByUserEmail = x.PromoCode.UsedByUserEmail,
-                        UsedOnOrderId = x.PromoCode.OrderId,
-                    },
-                    Subtotal = x.Subtotal,
-                    SubtotalWithPromo = x.SubtotalWithPromo,
-                    UserEmail = x.UserEmail,
-                    UserId = x.UserId
-                })
+                .Select(OrderListExpression)
                 .ToListAsync();
             return result;
         }
@@ -140,42 +142,7 @@ namespace ASPNetCoreWebApi.Repositories
                 .OrderByDescending(x => x.Id)
                 .Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize)
                 .Take(pagerHelper.PageSize)
-                .Select(x => new OrderForListDto
-                {
-                    CreatedDate = x.CreatedDate,
-                    Id = x.Id,
-                    IsShipped = x.IsShipped,
-                    OrderItems = x.OrderItems.Select(ot => new OrderItemDTO()
-                    {
-                        Id = ot.Id,
-                        ProductId = ot.ProductId,
-                        Product = new ProductDTO()
-                        {
-                            Id = ot.Product.Id,
-                            CategoryId = ot.Product.CategoryId,
-                            CreatedDate = ot.Product.CreatedDate,
-                            Description = ot.Product.Description,
-                            ImageName = ot.Product.ImageName,
-                            Name = ot.Product.Name,
-                            Price = ot.Product.Price
-                        },
-                        Quantity = ot.Quantity
-                    }).ToList(),
-                    PromoCode = x.PromoCode == null ? null : new PromoCodeDTO()
-                    {
-                        Id = x.PromoCode.Id,
-                        CreatedDate = x.PromoCode.CreatedDate,
-                        Discount = x.PromoCode.Discount,
-                        IsUsed = x.PromoCode.IsUsed,
-                        PromoCodeText = x.PromoCode.PromoCodeText,
-                        UsedByUserEmail = x.PromoCode.UsedByUserEmail,
-                        UsedOnOrderId = x.PromoCode.OrderId,
-                    },
-                    PromoCodeId = x.PromoCodeId,
-                    Subtotal = x.Subtotal,
-                    SubtotalWithPromo = x.SubtotalWithPromo,
-                    UserEmail = x.User.Email
-                })
+                .Select(OrderListExpression)
                 .ToListAsync();
             return result;
 

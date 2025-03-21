@@ -9,7 +9,7 @@ namespace ASPNetCoreWebApi.Domain.Repositories
         Task<List<ProductDTO>> GetAllByIds(List<int> ids);
         Task<int> Add(Product newItem);
         Task<Product> Update(Product item);
-        Task<Product> GetById(int id);
+        Task<ProductDTO> GetById(int id);
         Task<bool> Remove(int id);
     }
 }

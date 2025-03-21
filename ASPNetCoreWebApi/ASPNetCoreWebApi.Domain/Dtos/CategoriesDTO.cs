@@ -4,11 +4,11 @@ namespace ASPNetCoreWebApi.Domain.Dtos
 {
     public class CategoriesDTO
     {
-        public List<CategoryForListDto> CategoryList { get; set; }
+        public List<CategoryForListDTO> CategoryList { get; set; }
         public Pager Pager { get; set; }
     }
 
-    public class CategoryForListDto
+    public class CategoryForListDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

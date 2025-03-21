@@ -3,16 +3,20 @@ using ASPNetCoreWebApi.Domain.Models;
 using ASPNetCoreWebApi.Domain.Repositories;
 using ASPNetCoreWebApi.Domain.Dtos;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace ASPNetCoreWebApi.Repositories
 {
     public class ProductRepository : IProductRepository, IAsyncDisposable
     {
         private readonly ApplicationDbContext _context;
-
-        public ProductRepository(ApplicationDbContext context)
+        private readonly IMapper _mapper;
+        public ProductRepository(ApplicationDbContext context,
+            IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _mapper = mapper;
         }
 
         public async Task<int> Add(Product newItem)
@@ -58,20 +62,9 @@ namespace ASPNetCoreWebApi.Repositories
             PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex, pageSize, summaryTextAdd);
             result.Pager = pagerHelper.GetPager;
             result.ProductList = await products.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize).
-                Take(pagerHelper.PageSize).
-                Select(p => new ProductDTO
-                {
-                    CategoryId = p.CategoryId,
-                    CreatedDate = p.CreatedDate,
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    ImageName = p.ImageName,
-                    Price = p.Price,
-                    CategoryName = p.Category.Name,
-                    OrdersCount = p.OrderItems.Count()
-                }).
-                ToListAsync();
+                Take(pagerHelper.PageSize)
+               .ProjectTo<ProductDTO>(_mapper.ConfigurationProvider)
+               .ToListAsync();
             return result;
         }
 
@@ -79,23 +72,17 @@ namespace ASPNetCoreWebApi.Repositories
         {
             var products = await _context.Products.AsNoTracking()
                 .Where(x => ids.Contains(x.Id))
-                .Select(p => new ProductDTO
-                {
-                    CategoryId = p.CategoryId,
-                    CreatedDate = p.CreatedDate,
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    ImageName = p.ImageName,
-                    Price = p.Price
-                })
-                .ToListAsync();
+                .ProjectTo<ProductDTO>(_mapper.ConfigurationProvider).
+                 ToListAsync();
             return products;
         }
 
-        public async Task<Product> GetById(int id)
+        public async Task<ProductDTO> GetById(int id)
         {
-            return await _context.Products.AsNoTracking().SingleOrDefaultAsync(a => a.Id == id);
+            return await _context.Products.AsNoTracking()
+               .Include(x => x.OrderItems)
+               .ProjectTo<ProductDTO>(_mapper.ConfigurationProvider)
+               .SingleOrDefaultAsync(a => a.Id == id);
         }
 
         public async Task<bool> Remove(int id)
@@ -131,7 +118,8 @@ namespace ASPNetCoreWebApi.Repositories
 
         public async Task<Product> Update(Product item)
         {
-            var existing = await _context.Products.AsNoTracking().SingleOrDefaultAsync(a => a.Id == item.Id);
+            var existing = await _context.Products.AsNoTracking()
+                .SingleOrDefaultAsync(a => a.Id == item.Id);
             if (existing != null)
             {
                 item.CreatedDate = existing.CreatedDate;

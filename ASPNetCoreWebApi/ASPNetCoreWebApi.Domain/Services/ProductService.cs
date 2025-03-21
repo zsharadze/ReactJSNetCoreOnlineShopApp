@@ -35,7 +35,7 @@ namespace ASPNetCoreWebApi.Domain.Services
 
         public async Task<ProductDTO> GetById(int id)
         {
-            return _mapper.Map<ProductDTO>(await _repository.GetById(id));
+            return await _repository.GetById(id);
         }
 
         public Task<bool> Remove(int id)

@@ -3,16 +3,20 @@ using ASPNetCoreWebApi.Domain.Models;
 using ASPNetCoreWebApi.Domain.Repositories;
 using ASPNetCoreWebApi.Domain.Dtos;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper.QueryableExtensions;
+using AutoMapper;
 
 namespace ASPNetCoreWebApi.Repositories
 {
     public class CategoryRepository : ICategoryRepository, IAsyncDisposable
     {
         private readonly ApplicationDbContext _context;
-
-        public CategoryRepository(ApplicationDbContext context)
+        private readonly IMapper _mapper;
+        public CategoryRepository(ApplicationDbContext context,
+            IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _mapper = mapper;
         }
 
         public async Task<int> Add(Category newItem)
@@ -31,16 +35,11 @@ namespace ASPNetCoreWebApi.Repositories
         public async Task<CategoriesDTO> GetAllItems(string searchText, int? pageSize, int? pageIndex)
         {
             var result = new CategoriesDTO();
-            result.CategoryList = new List<CategoryForListDto>();
+            result.CategoryList = new List<CategoryForListDTO>();
 
-            var categories = _context.Categories.AsNoTracking().Include(x => x.Products).Select(c => new CategoryForListDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                FaClass = c.FaClass,
-                ImageName = c.ImageName,
-                ProductsCount = c.Products.Count
-            }).AsQueryable();
+            var categories = _context.Categories.AsNoTracking()
+                .Include(x => x.Products)
+                .AsQueryable();
             string summaryTextAdd = "";
 
             if (searchText != null)
@@ -57,15 +56,19 @@ namespace ASPNetCoreWebApi.Repositories
 
             if (pageSize == null || pageIndex == null)
             {
-                result.CategoryList = await categories.ToListAsync();
+                result.CategoryList = await categories.ProjectTo<CategoryForListDTO>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
                 return result;
             }
-            else if (pageSize.HasValue && pageIndex.HasValue)
+            else if(pageSize.HasValue && pageIndex.HasValue)
             {
                 int totalCount = await categories.CountAsync();
                 PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex.Value, pageSize.Value, summaryTextAdd);
                 result.Pager = pagerHelper.GetPager;
-                result.CategoryList = await categories.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize).Take(pagerHelper.PageSize).ToListAsync();
+                result.CategoryList = await categories.Skip((pagerHelper.CurrentPage - 1) * pagerHelper.PageSize)
+                    .Take(pagerHelper.PageSize)
+                    .ProjectTo<CategoryForListDTO>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
                 return result;
             }
             else

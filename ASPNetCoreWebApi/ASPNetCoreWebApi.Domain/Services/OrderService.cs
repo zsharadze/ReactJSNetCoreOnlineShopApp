@@ -22,19 +22,20 @@ namespace ASPNetCoreWebApi.Domain.Services
 
         public async Task<int> CreateOrder(List<CreateOrderRequestDTO> orderItemList, string promoCode, string userId)
         {
-            var orderItems = _mapper.Map<List<OrderItem>>(orderItemList);
             decimal subTotal = 0;
-            foreach (var item in orderItems)
+            var productIds = orderItemList.Select(x => x.ProductId).ToList();
+            var orderItemsProducts = await _productService.GetAllByIds(productIds);
+            foreach (var item in orderItemList)
             {
-                var product = await _productService.GetById(item.ProductId);
+                var product = orderItemsProducts.SingleOrDefault(x => x.Id == item.ProductId);
                 if (product == null)
                 {
-                    throw new Exception("product with id " + item.Id + " not found.");
+                    throw new Exception("product with id " + product.Id + " not found.");
                 }
 
                 subTotal += product.Price * item.Quantity;
             }
-
+            var orderItems = _mapper.Map<List<OrderItem>>(orderItemList);
             return await _repository.CreateOrder(orderItems, promoCode, subTotal, userId);
         }
 
