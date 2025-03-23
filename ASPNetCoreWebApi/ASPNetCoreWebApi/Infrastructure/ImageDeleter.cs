@@ -1,6 +1,6 @@
 ﻿namespace ASPNetCoreWebApi.Infrastructure
 {
-    public class ImageDeleter
+    public class ImageDeleter : IImageDeleter
     {
         private readonly IWebHostEnvironment _env;
 

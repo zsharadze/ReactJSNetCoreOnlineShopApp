@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Order } from "../models/order";
-import { orderApi } from "../api/api";
+import { orderApi } from "../api/apiAndInterceptor";
 
 type State = {
   orders: { pager: any; orderList: Order[] } | any;

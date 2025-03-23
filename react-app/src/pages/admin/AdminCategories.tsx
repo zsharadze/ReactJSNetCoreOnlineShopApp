@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { categoryApi } from "../../api/api";
+import { categoryApi } from "../../api/apiAndInterceptor";
 import { Pagination } from "@mui/material";
 import styles from "../../Admin.module.css";
 import Swal from "sweetalert2";
@@ -22,7 +22,7 @@ const AdminCategories = () => {
     setLoading(true);
     categoryApi()
       .getAll(pageIndex ?? 1, pageSize)
-      .then((res) => {       
+      .then((res) => {
         setLoading(false);
         setCategories(res.data);
       });
@@ -116,20 +116,13 @@ const AdminCategories = () => {
                           if (res.isConfirmed) {
                             categoryApi()
                               .delete(Number(item.id))
-                              .then((resDeleteCategory) => {    
-                                if (!resDeleteCategory.data?.success) {
-                                  Swal.fire({
-                                    title: "Delete",
-                                    text: "Can't delete category because there are products attached to it.",
-                                    icon: "error",
-                                  });
-                                } else {
-                                  navigate({
-                                    pathname: "/admin",
-                                    search: "?tabIndex=2",
-                                  });
-                                }
-                              });
+                              .then((resDeleteCategory) => {
+                                navigate({
+                                  pathname: "/admin",
+                                  search: "?tabIndex=2",
+                                });
+                              })
+                              .catch((error) => {});
                           }
                         });
                       }}

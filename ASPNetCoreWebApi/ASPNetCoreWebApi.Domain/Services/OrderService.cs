@@ -39,14 +39,14 @@ namespace ASPNetCoreWebApi.Domain.Services
             return await _repository.CreateOrder(orderItems, promoCode, subTotal, userId);
         }
 
-        public Task<OrdersDTO> GetAllItemsForCurrentUser(string userId, int pageSize, int pageIndex)
+        public Task<OrdersDTO> GetAllItemsForCurrentUser(string userId, int pageIndex, int pageSize)
         {
-            return _repository.GetAllItemsForCurrentUser(userId, pageSize, pageIndex);
+            return _repository.GetAllItemsForCurrentUser(userId, pageIndex, pageSize);
         }
 
-        public Task<OrdersDTO> GetAllItems(int pageSize, int pageIndex)
+        public Task<OrdersDTO> GetAllItems(int pageIndex, int pageSize)
         {
-            return _repository.GetAllItems(pageSize, pageIndex);
+            return _repository.GetAllItems(pageIndex, pageSize);
         }
 
         public Task<int> ShipOrder(int id)

@@ -21,7 +21,7 @@ import {
 import QuantityInput from "../../shared/componenets/QuantityInput";
 import { useNavigate } from "react-router-dom";
 import { store } from "../../redux/store";
-import { orderApi, promoCodeApi } from "../../api/api";
+import { orderApi, promoCodeApi } from "../../api/apiAndInterceptor";
 import Swal from "sweetalert2";
 import LoaderOverlay from "../../shared/componenets/LoaderOverlay";
 
@@ -35,7 +35,7 @@ function ShoppingCart() {
   const navigate = useNavigate();
   const auth = useSelector((state: RootState) => state.auth);
   const imagesUrl = process.env.REACT_APP_IMAGES_URL;
-  
+
   useEffect(() => {
     let allAddedProductIds: number[] = [];
     if (shoppingCart.shoppingCart.length > 0) {
@@ -76,7 +76,7 @@ function ShoppingCart() {
   const handleApplyPromoCode = () => {
     promoCodeApi()
       .getByPromoCodeText(promoCode.current)
-      .then((res) => {      
+      .then((res) => {
         if (res.data === "") {
           Swal.fire({
             title: "Promo",
@@ -117,6 +117,9 @@ function ShoppingCart() {
         .then((res) => {
           dispatch(clearCart());
           navigate("/orderplaced");
+        })
+        .catch((error) => {
+          
         });
     }
   };

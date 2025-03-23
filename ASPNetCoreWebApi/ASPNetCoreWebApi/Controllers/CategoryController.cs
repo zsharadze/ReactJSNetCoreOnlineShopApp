@@ -15,31 +15,28 @@ namespace ASPNetCoreWebApi.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
-        private readonly ImageFileSizeValidator _imageFileSizeValidator;
-        private readonly ImageSaver _imageSaver;
-        private readonly ImageDeleter _imageDeleter;
+        private readonly IImageSaver _imageSaver;
+        private readonly IImageDeleter _imageDeleter;
 
-        public CategoryController(ICategoryService categoryService,
-            ImageFileSizeValidator imageFileSizeValidator,
+        public CategoryController(ICategoryService categoryService,           
             IMapper mapper,
-            ImageSaver imageSaver,
-            ImageDeleter imageDeleter)
+            IImageSaver imageSaver,
+            IImageDeleter imageDeleter)
         {
             _categoryService = categoryService;
-            _imageFileSizeValidator = imageFileSizeValidator;
             _imageSaver = imageSaver;
             _imageDeleter = imageDeleter;
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(CategoriesDTO), 200)]
-        public async Task<IActionResult> GetAll(string searchText = null, int? pageSize = null, int? pageIndex = 1)
+        [ProducesResponseType(typeof(CategoriesDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll(string searchText = null, int? pageIndex = 1, int? pageSize = null)
         {
-            return Ok(await _categoryService.GetAllItems(searchText, pageSize, pageIndex));
+            return Ok(await _categoryService.GetAllItems(searchText, pageIndex, pageSize));
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(CategoryDTO), 200)]
+        [ProducesResponseType(typeof(CategoryDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> Details(int id)
         {
             return Ok(await _categoryService.GetById(id));
@@ -47,40 +44,19 @@ namespace ASPNetCoreWebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create([FromForm] CategoryDTO category)
         {
-
-            if (string.IsNullOrEmpty(category.FaClass) && category.ImageFile == null && string.IsNullOrEmpty(category.ImageName))
-            {
-                throw new Exception("FaClass and ImageFile both can't be null");
-            }
-
-            if (category.ImageFile != null)
-            {
-                var validImageSizeResult = _imageFileSizeValidator.IsValidSize(category.ImageFile);
-                if (!validImageSizeResult.Item1)
-                {
-                    return Ok(new ApiResponse() { Success = false, Message = validImageSizeResult.Item2 });
-                }
-            }
-
             category.ImageName = await _imageSaver.SaveImage(category.ImageFile, "images\\categories");
-
             await _categoryService.Add(category);
-            return Ok(new ApiResponse() { Success = true, Message = "" });
+            return Ok();
         }
 
         [HttpPut]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Edit([FromForm] CategoryDTO category)
         {
-            if (string.IsNullOrEmpty(category.FaClass) && category.ImageFile == null && string.IsNullOrEmpty(category.ImageName))
-            {
-                throw new Exception("FaClass and ImageFile both can't be null");
-            }
-
             var oldCategory = await _categoryService.GetById(category.Id);
             if (oldCategory == null)
             {
@@ -90,12 +66,6 @@ namespace ASPNetCoreWebApi.Controllers
 
             if (category.ImageFile != null)
             {
-                var validImageSizeResult = _imageFileSizeValidator.IsValidSize(category.ImageFile);
-                if (!validImageSizeResult.Item1)
-                {
-                    return Ok(new ApiResponse() { Success = false, Message = validImageSizeResult.Item2 });
-                }
-
                 imageFileName = await _imageSaver.SaveImage(category.ImageFile, "images\\categories");
                 _imageDeleter.DeleteImage(oldCategory.ImageName, "images\\categories");
             }
@@ -108,12 +78,12 @@ namespace ASPNetCoreWebApi.Controllers
             category.ImageName = imageFileName;
 
             await _categoryService.Update(category);
-            return Ok(new ApiResponse() { Success = true, Message = "" });
+            return Ok();
         }
 
         [HttpDelete]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(int id)
         {
             var oldCategory = await _categoryService.GetById(id);
@@ -124,10 +94,12 @@ namespace ASPNetCoreWebApi.Controllers
             _imageDeleter.DeleteImage(oldCategory.ImageName, "images\\categories");
 
             var success = await _categoryService.Remove(id);
-            if (success)
-                return Ok(new ApiResponse() { Success = true, Message = "" });
-            else
-                return Ok(new ApiResponse() { Success = false, Message = "Unhandled exception occured." });
+            if (!success)
+            {
+                ModelState.AddModelError("errors", "Can't delete category because there are products attached to it.");
+                return BadRequest(ModelState);
+            }
+            return Ok();
         }
     }
 }

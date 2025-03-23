@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { OrderItem } from "../../models/orderItem";
 import { useNavigate } from "react-router-dom";
-import { orderApi } from "../../api/api";
+import { orderApi } from "../../api/apiAndInterceptor";
 import { Button, Pagination } from "@mui/material";
 import React from "react";
 import LoaderOverlay from "../../shared/componenets/LoaderOverlay";

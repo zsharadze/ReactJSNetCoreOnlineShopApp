@@ -218,17 +218,22 @@ a {
   border: 1px solid gray;
 }
 
-.tdsCenter{
+.tdsCenter {
   text-align: center;
 }
 
-.MuiButton-icon.MuiButton-endIcon{
+.MuiButton-icon.MuiButton-endIcon {
   vertical-align: middle;
 }
 
-.quantityInputWrapperDiv{
+.quantityInputWrapperDiv {
   display: flex;
   flex-flow: row nowrap;
   justify-content: left;
   align-items: center;
+}
+
+/*allows new line with \n in toast message*/
+.Toastify__toast-body {
+  white-space: pre-line;
 }

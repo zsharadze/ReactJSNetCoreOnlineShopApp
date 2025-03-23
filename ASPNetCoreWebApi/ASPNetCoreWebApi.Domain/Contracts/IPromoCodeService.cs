@@ -5,10 +5,10 @@ namespace ASPNetCoreWebApi.Domain.Contracts
 {
     public interface IPromoCodeService
     {
-        Task<PromoCodesDTO> GetAllItems(string searchText, int pageSize, int pageIndex, bool? getOnlyUsed);
+        Task<PromoCodesDTO> GetAllItems(string searchText, int pageIndex, int pageSize, bool? getOnlyUsed);
         Task<int> Add(PromoCode newItem);
         Task<bool> Remove(int id);
-        Task<bool> GeneratePromoCodes(int quantity, int discount);
+        Task GeneratePromoCodes(int quantity, int discount);
         Task<PromoCodeDTO> GetByPromoCodeText(string promoCodeText);
     }
 }

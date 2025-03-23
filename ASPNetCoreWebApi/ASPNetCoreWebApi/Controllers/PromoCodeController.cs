@@ -20,14 +20,14 @@ namespace ASPNetCoreWebApi.Controllers
 
         [HttpGet]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(PromoCodesDTO), 200)]
-        public async Task<IActionResult> GetAll(string searchText = null, int pageSize = 20, int pageIndex = 1, bool? getOnlyUsed = false)
+        [ProducesResponseType(typeof(PromoCodesDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll(string searchText = null, int pageIndex = 1, int pageSize = 10, bool? getOnlyUsed = false)
         {
-            return Ok(await _promoCodeService.GetAllItems(searchText, pageSize, pageIndex, getOnlyUsed));
+            return Ok(await _promoCodeService.GetAllItems(searchText, pageIndex, pageSize, getOnlyUsed));
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(PromoCodeDTO), 200)]
+        [ProducesResponseType(typeof(PromoCodeDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByPromoCodeText(string promoCodeText)
         {
             return Ok(await _promoCodeService.GetByPromoCodeText(promoCodeText));
@@ -35,27 +35,26 @@ namespace ASPNetCoreWebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GeneratePromoCodes(int quantity, int discount)
         {
-            var success = await _promoCodeService.GeneratePromoCodes(quantity, discount);
-            if (success)
-                return Ok(new ApiResponse() { Success = true, Message = "" });
-            else
-                return Ok(new ApiResponse() { Success = false, Message = "Unhandled exception occured." });
+            await _promoCodeService.GeneratePromoCodes(quantity, discount);
+            return Ok();
         }
 
         [HttpDelete]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _promoCodeService.Remove(id);
 
-            if (success)
-                return Ok(new ApiResponse() { Success = true, Message = "" });
-            else
-                return Ok(new ApiResponse() { Success = false, Message = "Used promo code can't be deleted." });
+            if (!success)
+            {
+                ModelState.AddModelError("errors", "Used promo code can't be deleted.");
+                return BadRequest(ModelState);
+            }
+            return Ok();
         }
     }
 }

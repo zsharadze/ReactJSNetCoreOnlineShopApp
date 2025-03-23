@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using ASPNetCoreWebApi.Domain.Models;
+using ASPNetCoreWebApi.Extensions;
 
 namespace ASPNetCoreWebApi.Controllers
 {
@@ -20,44 +21,36 @@ namespace ASPNetCoreWebApi.Controllers
             _orderService = orderService;
         }
 
-        public string CurrentUserId
-        {
-            get
-            {
-                return User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            }
-        }
-
         [HttpPost]
         [Authorize]
-        [ProducesResponseType(typeof(int), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateOrder([FromBody] List<CreateOrderRequestDTO> orderItems, string promoCode)
         {
             if (!orderItems.Any())
                 throw new Exception("Invalid order items passed");
-            return Ok(await _orderService.CreateOrder(orderItems, promoCode, CurrentUserId));
+            return Ok(await _orderService.CreateOrder(orderItems, promoCode, User.GetCurrentUserId()));
         }
 
         [HttpGet]
         [Authorize]
-        [ProducesResponseType(typeof(OrdersDTO), 200)]
-        public async Task<IActionResult> GetAllForCurrentUser(int pageSize = 20, int pageIndex = 1)
+        [ProducesResponseType(typeof(OrdersDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllForCurrentUser(int pageIndex = 1, int pageSize = 10)
         {
-            return Ok(await _orderService.GetAllItemsForCurrentUser(CurrentUserId, pageSize, pageIndex));
+            return Ok(await _orderService.GetAllItemsForCurrentUser(User.GetCurrentUserId(), pageIndex, pageSize));
         }
 
         [HttpGet]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(OrdersDTO), 200)]
+        [ProducesResponseType(typeof(OrdersDTO), StatusCodes.Status200OK)]
 
-        public async Task<IActionResult> GetAll(int pageSize = 20, int pageIndex = 1)
+        public async Task<IActionResult> GetAll(int pageIndex = 1, int pageSize = 10)
         {
-            return Ok(await _orderService.GetAllItems(pageSize, pageIndex));
+            return Ok(await _orderService.GetAllItems(pageIndex, pageSize));
         }
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(int), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ShipOrder(int id)
         {
             return Ok(await _orderService.ShipOrder(id));

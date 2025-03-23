@@ -1,6 +1,6 @@
 ﻿namespace ASPNetCoreWebApi.Infrastructure
 {
-    public class ImageSaver
+    public class ImageSaver : IImageSaver
     {
         private readonly IWebHostEnvironment _env;
 

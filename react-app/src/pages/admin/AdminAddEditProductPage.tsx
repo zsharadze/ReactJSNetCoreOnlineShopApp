@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
-import { categoryApi, productApi } from "../../api/api";
+import { categoryApi, productApi } from "../../api/apiAndInterceptor";
 import {
   Box,
   TextField,
@@ -69,7 +69,7 @@ const AdminAddEditProduct = () => {
       });
   }, []);
 
-  const handleChangeCategory = (event: any) => {    
+  const handleChangeCategory = (event: any) => {
     setCategoryId(event.target.value);
   };
 
@@ -84,7 +84,7 @@ const AdminAddEditProduct = () => {
           .replace("data:image/png;base64,", "")
           .replace("data:image/jpeg;base64,", "")
           .replace("data:image/gif;base64,", "");
-          setImagePreviewSrc(base64Str);
+        setImagePreviewSrc(base64Str);
       };
       reader.onerror = function (error) {
         console.log("Error: ", error);
@@ -110,46 +110,36 @@ const AdminAddEditProduct = () => {
     }
 
     const formData = new FormData();
-        formData.append("id", productId?.toString() ?? "0");
-        formData.append("name", name);
-        formData.append("categoryId", categoryId?.toString());
-        formData.append("description", description);
-        formData.append("price", price);
-        if (imageFile) {
-          formData.set("imageFile", imageFile);
-        }
+    formData.append("id", productId?.toString() ?? "0");
+    formData.append("name", name);
+    formData.append("categoryId", categoryId?.toString());
+    formData.append("description", description);
+    formData.append("price", price);
+    if (imageFile) {
+      formData.set("imageFile", imageFile);
+    }
 
     if (!productId) {
       setLoading(true);
       productApi()
         .create(formData)
         .then((res) => {
-          setLoading(false);    
-          if (!res.data.success) {
-            Swal.fire({
-              title: "Image error",
-              text: res.data.message,
-              icon: "error",
-            });
-          } else {
-            redirectToAdminProducts();
-          }
+          redirectToAdminProducts();
+        })
+        .catch((error) => {})
+        .finally(() => {
+          setLoading(false);
         });
     } else {
       setLoading(true);
       productApi()
         .update(formData)
         .then((res) => {
+          redirectToAdminProducts();
+        })
+        .catch((error) => {})
+        .finally(() => {
           setLoading(false);
-          if (!res.data.success) {
-            Swal.fire({
-              title: "Image error",
-              text: res.data.message,
-              icon: "error",
-            });
-          } else {
-            redirectToAdminProducts();
-          }
         });
     }
   };
@@ -285,9 +275,15 @@ const AdminAddEditProduct = () => {
         />
       </Box>
       <img
-        style={{ display: (imagePreviewSrc || imageName) ? "" : "none" }}
+        style={{ display: imagePreviewSrc || imageName ? "" : "none" }}
         className={`${styles.addProductShowImg}`}
-        src={imagePreviewSrc ? "data:image/jpeg;base64," + imagePreviewSrc :  (imageName ? imagesUrl + "products/" + imageName : "")}
+        src={
+          imagePreviewSrc
+            ? "data:image/jpeg;base64," + imagePreviewSrc
+            : imageName
+            ? imagesUrl + "products/" + imageName
+            : ""
+        }
         alt="productImage"
       />
       <Box sx={{ marginTop: "15px" }}>

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { authApi } from "../api/api";
+import { authApi } from "../api/apiAndInterceptor";
 
 type User = {
   userEmail: string;
@@ -76,7 +76,8 @@ export const loginAsync =
         if (callback) {
           callback(res.data, res.data.userRole);
         }
-      });
+      })
+      .catch((error) => {});
   };
 
 export const logoutAsync = (callback?: any) => (dispatch: any) => {

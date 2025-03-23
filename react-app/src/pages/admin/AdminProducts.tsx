@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import { productApi } from "../../api/api";
+import { productApi } from "../../api/apiAndInterceptor";
 import { Pagination } from "@mui/material";
 import styles from "../../Admin.module.css";
 import Swal from "sweetalert2";
@@ -12,7 +12,7 @@ const AdminProducts = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const imagesUrl = process.env.REACT_APP_IMAGES_URL;
-  
+
   useEffect(() => {
     getProducts();
   }, []);
@@ -146,6 +146,10 @@ const AdminProducts = () => {
                                   pathname: "/admin",
                                   search: "?tabIndex=1",
                                 });
+                              })
+                              .catch((error) => {})
+                              .finally(() => {
+                                setLoading(false);
                               });
                           }
                         });

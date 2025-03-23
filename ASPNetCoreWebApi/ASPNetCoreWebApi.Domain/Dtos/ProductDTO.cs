@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ASPNetCoreWebApi.Domain.Validators;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace ASPNetCoreWebApi.Domain.Dtos
         public string Description { get; set; }
         public decimal Price { get; set; }
         public string ImageName { get; set; }
+        [ImageFileSizeValidator]
         public IFormFile ImageFile { get; set; }
         public DateTime CreatedDate { get; set; }
         public string CategoryName { get; set; }

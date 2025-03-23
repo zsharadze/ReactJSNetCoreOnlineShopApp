@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace ASPNetCoreWebApi.Infrastructure
+namespace ASPNetCoreWebApi.Extensions
 {
     public static class SeederExtension
     {

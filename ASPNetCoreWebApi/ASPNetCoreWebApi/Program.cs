@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
 using ASPNetCoreWebApi.Domain.Models;
+using ASPNetCoreWebApi.Extensions;
 
 string MyAllowSpecificOrigins = "localhost-react";
 
@@ -51,10 +52,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
-builder.Services.AddScoped<ImageFileSizeValidator>();
-builder.Services.AddScoped<EmailValidator>();
-builder.Services.AddScoped<ImageSaver>();
-builder.Services.AddScoped<ImageDeleter>();
+builder.Services.AddScoped<IImageSaver, ImageSaver>();
+builder.Services.AddScoped<IImageDeleter, ImageDeleter>();
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddRoles<IdentityRole>()
@@ -93,7 +92,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
     // Lockout settings.
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 30;
+    options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
 
     // User settings.

@@ -7,7 +7,7 @@ import {
   CssBaseline,
   Grid,
   TextField,
-  Typography,  
+  Typography,
 } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
 import { useState } from "react";
@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { validateEmail } from "../../helpers/emailValidator";
 import Swal from "sweetalert2";
-import { authApi } from "../../api/api";
+import { authApi } from "../../api/apiAndInterceptor";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
@@ -44,20 +44,16 @@ const Register = () => {
     authApi()
       .register(email, password, registerAsAdmin)
       .then((res: any) => {
-        if (res.data.success) {
-          Swal.fire({
-            title: "Registration",
-            text: "Registration successfull. You can login.",
-            icon: "success",
-          }).then(function () { navigate("/login");});
-        }
-        else{
-          Swal.fire({
-            title: "Registration",
-            text: "Invalid email. Please try again.",
-            icon: "error",
-          })
-        }
+        Swal.fire({
+          title: "Registration",
+          text: "Registration successfull. You can login.",
+          icon: "success",
+        }).then(function () {
+          navigate("/login");
+        });
+      })
+      .catch((error) => {
+        
       });
   };
 

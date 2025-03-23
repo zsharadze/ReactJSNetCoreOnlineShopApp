@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using System.Reflection;
 
-namespace ASPNetCoreWebApi.Infrastructure
+namespace ASPNetCoreWebApi.Extensions
 {
     public static class AutoMapperExtention
     {

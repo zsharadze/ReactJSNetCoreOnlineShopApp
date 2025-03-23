@@ -32,7 +32,7 @@ namespace ASPNetCoreWebApi.Repositories
             }
         }
 
-        public async Task<CategoriesDTO> GetAllItems(string searchText, int? pageSize, int? pageIndex)
+        public async Task<CategoriesDTO> GetAllItems(string searchText, int? pageIndex, int? pageSize)
         {
             var result = new CategoriesDTO();
             result.CategoryList = new List<CategoryForListDTO>();
@@ -60,7 +60,7 @@ namespace ASPNetCoreWebApi.Repositories
                     .ToListAsync();
                 return result;
             }
-            else if(pageSize.HasValue && pageIndex.HasValue)
+            else if (pageSize.HasValue && pageIndex.HasValue)
             {
                 int totalCount = await categories.CountAsync();
                 PagerHelper pagerHelper = new PagerHelper(totalCount, pageIndex.Value, pageSize.Value, summaryTextAdd);
@@ -73,24 +73,42 @@ namespace ASPNetCoreWebApi.Repositories
             }
             else
             {
-                throw new Exception("pageSize or pageIndex parameter is null");
+                throw new Exception("pageIndex or pageSize parameter is null");
             }
         }
 
         public async Task<Category> GetById(int id)
         {
-            return await _context.Categories.AsNoTracking().SingleOrDefaultAsync(a => a.Id == id);
+            return await _context.Categories.AsNoTracking()
+                .SingleOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async Task<Category> Update(Category item)
+        {
+            _context.Categories.Update(item);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                throw;
+            }
+
+            return item;
         }
 
         public async Task<bool> Remove(int id)
         {
-            Category entity = await _context.Categories.Include(x => x.Products).SingleOrDefaultAsync(a => a.Id == id);
+            Category entity = await _context.Categories.Include(x => x.Products)
+                .SingleOrDefaultAsync(a => a.Id == id);
             if (entity != null)
             {
                 if (entity.Products.Any())
                 {
                     return false;
                 }
+
                 _context.Categories.Remove(entity);
                 try
                 {
@@ -103,25 +121,6 @@ namespace ASPNetCoreWebApi.Repositories
             }
 
             return true;
-        }
-
-        public async Task<Category> Update(Category item)
-        {
-            var existing = await _context.Categories.AsNoTracking().SingleOrDefaultAsync(a => a.Id == item.Id);
-            if (existing != null)
-            {
-                _context.Categories.Update(item);
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch
-                {
-                    throw;
-                }
-            }
-
-            return existing;
         }
 
         public ValueTask DisposeAsync()

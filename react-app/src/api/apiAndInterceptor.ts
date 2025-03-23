@@ -2,15 +2,13 @@ import axios from "axios";
 import { Product } from "../models/product";
 import { Category } from "../models/category";
 import { ChangePassword } from "../models/changePassword";
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const pageSize = 12;
 
 export const productApi = () => {
   let url = process.env.REACT_APP_API_URL + "product/";
-  let token = localStorage.getItem("token");
-  if (token != null) {
-    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-  }
 
   return {
     getAll: (
@@ -51,10 +49,6 @@ export const productApi = () => {
 
 export const categoryApi = () => {
   let url = process.env.REACT_APP_API_URL + "category/";
-  let token = localStorage.getItem("token");
-  if (token != null) {
-    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-  }
 
   return {
     getAll: (pageIndex?: number, pageSizePar?: number, searchText?: string) =>
@@ -87,10 +81,6 @@ export const categoryApi = () => {
 
 export const authApi = () => {
   let url = process.env.REACT_APP_API_URL + "authenticate/";
-  let token = localStorage.getItem("token");
-  if (token != null) {
-    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-  }
 
   return {
     login: (email: string, password: string) =>
@@ -113,10 +103,6 @@ export const authApi = () => {
 
 export const orderApi = () => {
   let url = process.env.REACT_APP_API_URL + "order/";
-  let token = localStorage.getItem("token");
-  if (token != null) {
-    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-  }
 
   return {
     getAll: (pageIndex: number, pageSizePar?: number) =>
@@ -147,10 +133,6 @@ export const orderApi = () => {
 
 export const promoCodeApi = () => {
   let url = process.env.REACT_APP_API_URL + "promocode/";
-  let token = localStorage.getItem("token");
-  if (token != null) {
-    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-  }
 
   return {
     getAll: (
@@ -180,3 +162,57 @@ export const promoCodeApi = () => {
       axios.get(url + "getbypromocodetext/?promoCodeText=" + promoCodeText),
   };
 };
+
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers["Authorization"] = "Bearer " + token;
+    }
+    //config.headers['Content-Type'] = 'application/json';
+    return config;
+  },
+  (error) => {
+    Promise.reject(error);
+  }
+);
+
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  function (e) {
+    console.log("error", e);
+    let errors = "";
+    if (e.response?.data?.errors) {
+
+      Object.keys(e.response?.data?.errors).map(function (keyName, keyIndex) {
+        if (typeof e.response?.data?.errors[keyName] == "string") {
+          errors += e.response?.data?.errors[keyName] + "\n";
+        } else {
+          errors += e.response?.data?.errors[keyName][0] + "\n";
+        }
+      });
+    }
+
+    if (e.status === 401) {
+      errors += "Unauthorized";
+    }
+    errors = e.message + "\n" + errors;
+    showToastError(errors);
+    return Promise.reject(e);
+  }
+);
+
+function showToastError(errorMessage: string) {
+  toast.error(errorMessage, {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "colored",
+  });
+}

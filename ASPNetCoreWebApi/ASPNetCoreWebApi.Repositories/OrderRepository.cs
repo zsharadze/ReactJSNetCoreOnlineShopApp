@@ -105,7 +105,7 @@ namespace ASPNetCoreWebApi.Repositories
             }
         }
 
-        public async Task<OrdersDTO> GetAllItemsForCurrentUser(string userId, int pageSize, int pageIndex)
+        public async Task<OrdersDTO> GetAllItemsForCurrentUser(string userId, int pageIndex, int pageSize)
         {
             OrdersDTO result = new OrdersDTO();
 
@@ -127,7 +127,7 @@ namespace ASPNetCoreWebApi.Repositories
             return result;
         }
 
-        public async Task<OrdersDTO> GetAllItems(int pageSize, int pageIndex)
+        public async Task<OrdersDTO> GetAllItems(int pageIndex, int pageSize)
         {
             OrdersDTO result = new OrdersDTO();
 

@@ -3,7 +3,7 @@ import { Box, Button, Grid, Pagination, Typography } from "@mui/material";
 import styles from "../../Admin.module.css";
 import Swal from "sweetalert2";
 import LoaderOverlay from "../../shared/componenets/LoaderOverlay";
-import { promoCodeApi } from "../../api/api";
+import { promoCodeApi } from "../../api/apiAndInterceptor";
 import { PromoCode } from "../../models/promoCode";
 import { useNavigate } from "react-router-dom";
 import MoneyIcon from "@mui/icons-material/Money";
@@ -58,7 +58,8 @@ const AdminPromoCodes = () => {
       .generate(inputPromoCodeQuantity, inputPromoCodeDiscount)
       .then((res) => {
         getPromoCodes(1);
-      });
+      })
+      .catch((error) => {});
   };
 
   return (
@@ -172,20 +173,13 @@ const AdminPromoCodes = () => {
                           if (res.isConfirmed) {
                             promoCodeApi()
                               .delete(Number(item.id))
-                              .then((resDeletePromoCode: any) => {
-                                if (!resDeletePromoCode.data.success) {
-                                  Swal.fire({
-                                    title: "Error",
-                                    text: resDeletePromoCode.data.message,
-                                    icon: "error",
-                                  });
-                                } else {
-                                  navigate({
-                                    pathname: "/admin",
-                                    search: "?tabIndex=3",
-                                  });
-                                }
-                              });
+                              .then((res: any) => {
+                                navigate({
+                                  pathname: "/admin",
+                                  search: "?tabIndex=3",
+                                });
+                              })
+                              .catch((error) => {});
                           }
                         });
                       }}

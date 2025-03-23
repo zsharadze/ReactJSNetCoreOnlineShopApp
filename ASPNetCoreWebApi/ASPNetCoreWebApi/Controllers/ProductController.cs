@@ -14,36 +14,33 @@ namespace ASPNetCoreWebApi.Controllers
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
-        private readonly ImageFileSizeValidator _imageFileSizeValidator;
-        private readonly ImageSaver _imageSaver;
-        private readonly ImageDeleter _imageDeleter;
+        private readonly IImageSaver _imageSaver;
+        private readonly IImageDeleter _imageDeleter;
         public ProductController(IProductService productService,
-            ImageFileSizeValidator imageFileSizeValidator,
-            ImageSaver imageSaver,
-            ImageDeleter imageDeleter)
+            IImageSaver imageSaver,
+            IImageDeleter imageDeleter)
         {
             _productService = productService;
-            _imageFileSizeValidator = imageFileSizeValidator;
             _imageSaver = imageSaver;
             _imageDeleter = imageDeleter;
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ProductsDTO), 200)]
-        public async Task<IActionResult> GetAll(int? categoryId, string searchText, int pageSize = 20, int pageIndex = 1)
+        [ProducesResponseType(typeof(ProductsDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll(int? categoryId, string searchText, int pageIndex = 1, int pageSize = 10)
         {
-            return Ok(await _productService.GetAllItems(categoryId, searchText, pageSize, pageIndex));
+            return Ok(await _productService.GetAllItems(categoryId, searchText, pageIndex, pageSize));
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(List<ProductDTO>), 200)]
+        [ProducesResponseType(typeof(List<ProductDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllByIds(List<int> ids)
         {
             return Ok(await _productService.GetAllByIds(ids));
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ProductDTO), 200)]
+        [ProducesResponseType(typeof(ProductDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> Details(int id)
         {
             return Ok(await _productService.GetById(id));
@@ -51,23 +48,18 @@ namespace ASPNetCoreWebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create([FromForm] ProductDTO product)
         {
-            var validImageSizeResult = _imageFileSizeValidator.IsValidSize(product.ImageFile);
-            if (!validImageSizeResult.Item1)
-            {
-                return Ok(new ApiResponse() { Success = false, Message = validImageSizeResult.Item2 });
-            }
             product.ImageName = await _imageSaver.SaveImage(product.ImageFile, "images\\products");
 
             await _productService.Add(product);
-            return Ok(new ApiResponse() { Success = true, Message = "" });
+            return Ok();
         }
 
         [HttpPut]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Edit([FromForm] ProductDTO product)
         {
             var oldProduct = await _productService.GetById(product.Id);
@@ -79,24 +71,18 @@ namespace ASPNetCoreWebApi.Controllers
 
             if (product.ImageFile != null)
             {
-                var validImageSizeResult = _imageFileSizeValidator.IsValidSize(product.ImageFile);
-                if (!validImageSizeResult.Item1)
-                {
-                    return Ok(new ApiResponse() { Success = false, Message = validImageSizeResult.Item2 });
-                }
-
                 imageFileName = await _imageSaver.SaveImage(product.ImageFile, "images\\products");
-                _imageDeleter.DeleteImage(oldProduct.ImageName, "images\\products");                
+                _imageDeleter.DeleteImage(oldProduct.ImageName, "images\\products");
             }
             product.ImageName = imageFileName;
 
             await _productService.Update(product);
-            return Ok(new ApiResponse() { Success = true, Message = "" });
+            return Ok();
         }
 
         [HttpDelete]
         [Authorize(Roles = UserRoles.Admin)]
-        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(int id)
         {
             var oldProduct = await _productService.GetById(id);
@@ -106,19 +92,8 @@ namespace ASPNetCoreWebApi.Controllers
             }
             _imageDeleter.DeleteImage(oldProduct.ImageName, "images\\products");
 
-            var success = await _productService.Remove(id);
-            if (success)
-                return Ok(new ApiResponse() { Success = true, Message = "" });
-            else
-                return Ok(new ApiResponse() { Success = false, Message = "Unhandled exception occured." });
-        }
-
-        public string CurrentUserId
-        {
-            get
-            {
-                return User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            }
+            await _productService.Remove(id);
+            return Ok();
         }
     }
 }

@@ -21,6 +21,7 @@ import ChangePasswordSuccess from "./pages/authentication/ChangePasswordSuccessP
 import { lazy, Suspense } from "react";
 import AdminAddEditProduct from "./pages/admin/AdminAddEditProductPage";
 import AdminAddEditCategory from "./pages/admin/AdminAddEditCategoryPage";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const auth = useSelector((state: RootState) => state.auth);
@@ -74,6 +75,7 @@ function App() {
     <>
       <Router>
         <AuthVerify />
+        <ToastContainer />
         <Routes>
           <Route
             path="/"
@@ -119,7 +121,7 @@ function App() {
             path="/register"
             element={
               <LayoutProductDetails>
-                <Register />
+                <Register />                
               </LayoutProductDetails>
             }
           />

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { productApi } from "../api/api";
+import { productApi } from "../api/apiAndInterceptor";
 
 type ShoppingCartItem = {
   productId: number;

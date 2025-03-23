@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../redux/store";
 import { ChangePassword as ChangePasswordModel } from "../../models/changePassword";
-import { authApi } from "../../api/api";
+import { authApi } from "../../api/apiAndInterceptor";
 
 const ChangePassword = () => {
   const [email, setEmail] = useState("");
@@ -51,12 +51,10 @@ const ChangePassword = () => {
     authApi()
       .changePassword(changePasswordObj)
       .then((res) => {
-        if (res.data.success) {
-          navigate("/changepasswordsuccess");
-        } else {
-          setErrorText(res.data.message);
-          setShowInvalidPasswordText(true);
-        }
+        navigate("/changepasswordsuccess");
+      })
+      .catch((error) => {
+        setShowInvalidPasswordText(true);
       });
   };
 

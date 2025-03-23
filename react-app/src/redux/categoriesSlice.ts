@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Category } from "../models/category";
-import { categoryApi } from "../api/api";
+import { categoryApi } from "../api/apiAndInterceptor";
 
 type State = {
   categories: { pager: any; categoryList: Category[] } | any;
@@ -33,7 +33,7 @@ export const getCategoriesAsync =
   (pageIndex?: number, searchText?: string, callback?: any) =>
   (dispatch: any) => {
     categoryApi()
-      .getAll(undefined, pageIndex, searchText)
+      .getAll(pageIndex, undefined, searchText)
       .then((result) => {
         if (callback) {
           callback(result?.data?.categoryList);
@@ -41,5 +41,5 @@ export const getCategoriesAsync =
         dispatch(getCategories(result));
       });
   };
-
+  
 export default categoriesSlice.reducer;

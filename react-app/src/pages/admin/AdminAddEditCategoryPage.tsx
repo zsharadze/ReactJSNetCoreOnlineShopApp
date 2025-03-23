@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
-import { categoryApi } from "../../api/api";
+import { categoryApi } from "../../api/apiAndInterceptor";
 import { Box, TextField, Button, FormControlLabel, Radio } from "@mui/material";
 import RadioGroup from "@mui/material/RadioGroup";
 import styles from "../../Admin.module.css";
@@ -39,7 +39,7 @@ const AdminAddEditCategory = () => {
         .then((res) => {
           setLoading(false);
           setName(res.data.name);
-          setFontAwsomeClassName(res.data.faClass ?? '');
+          setFontAwsomeClassName(res.data.faClass ?? "");
           setImageName(res.data.imageName);
           if (!res.data.faClass) {
             setFontAwsomeOrImage("image");
@@ -59,7 +59,7 @@ const AdminAddEditCategory = () => {
           .replace("data:image/png;base64,", "")
           .replace("data:image/jpeg;base64,", "")
           .replace("data:image/gif;base64,", "");
-          setImagePreviewSrc(base64Str);
+        setImagePreviewSrc(base64Str);
       };
       reader.onerror = function (error) {
         console.log("Error: ", error);
@@ -109,39 +109,31 @@ const AdminAddEditCategory = () => {
     if (imageFile) {
       formData.set("imageFile", imageFile);
     }
-    
+
     if (!categoryId) {
       setLoading(true);
       categoryApi()
         .create(formData)
         .then((res) => {
-          setLoading(false);          
-          if (!res.data.success) {
-            Swal.fire({
-              title: "Image error",
-              text: res.data.message,
-              icon: "error",
-            });
-          } else {
-            redirectToAdminCategories();
-          }
+          
+          redirectToAdminCategories();
+        })
+        .catch((error) => {})
+        .finally(() => {
+          setLoading(false);
         });
     } else {
       setLoading(true);
       categoryApi()
         .update(formData)
         .then((res) => {
+          redirectToAdminCategories();
+        })
+        .catch((error) => {
+          
+        }).finally(() => {
           setLoading(false);
-          if (!res.data.success) {
-            Swal.fire({
-              title: "Image error",
-              text: res.data.message,
-              icon: "error",
-            });
-          } else {
-            redirectToAdminCategories();
-          }
-        });
+        });;
     }
   };
 
@@ -211,9 +203,15 @@ const AdminAddEditCategory = () => {
           onChange={(e) => setAddEditCategoryImageFile(e)}
         />
         <img
-          style={{ display: (imagePreviewSrc || imageName) ? "" : "none" }}
+          style={{ display: imagePreviewSrc || imageName ? "" : "none" }}
           className={`${styles.addProductShowImg}`}
-         src={imagePreviewSrc ? "data:image/jpeg;base64," + imagePreviewSrc :  (imageName ? imagesUrl + "categories/" + imageName : "")}
+          src={
+            imagePreviewSrc
+              ? "data:image/jpeg;base64," + imagePreviewSrc
+              : imageName
+              ? imagesUrl + "categories/" + imageName
+              : ""
+          }
           alt="productImage"
         />
       </Box>

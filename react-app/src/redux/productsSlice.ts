@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Product } from "../models/product";
-import { productApi } from "../api/api";
+import { productApi } from "../api/apiAndInterceptor";
 
 type State = {
   products: { pager: any; productList: Product[] } | any;

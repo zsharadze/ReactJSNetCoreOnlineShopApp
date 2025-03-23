@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ASPNetCoreWebApi.Domain.Models;
+using ASPNetCoreWebApi.Extensions;
 
 namespace ASPNetCoreWebApi.Controllers
 {
@@ -16,22 +17,42 @@ namespace ASPNetCoreWebApi.Controllers
     public class AuthenticateController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly EmailValidator _emailValidator;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
 
-        public AuthenticateController(UserManager<ApplicationUser> userManager, IConfiguration configuration, EmailValidator emailValidator)
+        public AuthenticateController(UserManager<ApplicationUser> userManager,
+            IConfiguration configuration,
+            SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _configuration = configuration;
-            _emailValidator = emailValidator;
+            _signInManager = signInManager;
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Login([FromBody] Login model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            if (user == null)
+            {
+                ModelState.AddModelError("errors", "Invalid credentials. try again.");
+                return BadRequest(ModelState);
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, true);
+            if (result.IsLockedOut)
+            {
+                ModelState.AddModelError("errors", "User is locked out.");
+                return BadRequest(ModelState);
+            }
+            else if (!result.Succeeded)
+            {
+                ModelState.AddModelError("errors", "Invalid credentials. try again.");
+                return BadRequest(ModelState);
+            }
+            else if (result.Succeeded)
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
                 var clims = new List<Claim>() {
@@ -64,23 +85,21 @@ namespace ASPNetCoreWebApi.Controllers
                     UserRole = userRoles.First(),
                 });
             }
-            return Ok(new ApiResponse { Success = false, Message = "Invalid credentials. try again." });
+            ModelState.AddModelError("errors", "Unknown error.");
+            return BadRequest(ModelState);
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register([FromBody] Register model)
         {
-            if (!_emailValidator.IsValidEmail(model.Email))
-            {
-                return Ok(new ApiResponse { Success = false, Message = "Invalid email address" });
-            }
-
             var userExists = await _userManager.FindByEmailAsync(model.Email);
             if (userExists != null)
-                return Ok(new ApiResponse { Success = false, Message = "User already exists!" });
-
+            {
+                ModelState.AddModelError("errors", "User already exists!");
+                return BadRequest(ModelState);
+            }
             ApplicationUser user = new ApplicationUser()
             {
                 Email = model.Email,
@@ -90,8 +109,10 @@ namespace ASPNetCoreWebApi.Controllers
             };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Success = false, Message = "User creation failed! Please check user details and try again." });
-
+            {
+                ModelState.AddModelError("errors", "User creation failed! Please check user details and try again.");
+                return StatusCode(StatusCodes.Status500InternalServerError, ModelState);
+            }
             if (!model.RegisterAsAdmin)
             {
                 await _userManager.AddToRoleAsync(user, UserRoles.User);
@@ -101,42 +122,34 @@ namespace ASPNetCoreWebApi.Controllers
                 await _userManager.AddToRoleAsync(user, UserRoles.Admin);
             }
 
-            return Ok(new ApiResponse { Success = true, Message = "User created successfully!" });
+            return Ok();
         }
 
         [HttpPost]
         [Authorize]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePassword model)
         {
             if (model.NewPassword != model.ConfirmPassword)
             {
-                return Ok(new ApiResponse() { Success = false, Message = "Confirm password does not match." });
+                ModelState.AddModelError("errors", "Confirm password does not match.");
+                return BadRequest(ModelState);
             }
 
-            var user = await _userManager.FindByIdAsync(CurrentUserId);
+            var user = await _userManager.FindByIdAsync(User.GetCurrentUserId());
             if (user == null)
             {
                 throw new Exception("User not found");
             }
 
             var res = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-            if (res.Succeeded)
+            if (!res.Succeeded)
             {
-                return Ok(new ApiResponse() { Success = true, Message = "Password Changed Successfully." });
+                ModelState.AddModelError("errors", "Old password is incorrect.");
+                return BadRequest(ModelState);
             }
-            else
-            {
-                return Ok(new ApiResponse() { Success = false, Message = "Old password is incorrect." });
-            }
-        }
-
-        public string CurrentUserId
-        {
-            get
-            {
-                return User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            }
+            return Ok();
         }
     }
 }

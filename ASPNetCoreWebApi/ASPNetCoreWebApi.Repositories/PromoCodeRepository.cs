@@ -32,7 +32,7 @@ namespace ASPNetCoreWebApi.Repositories
             }
         }
 
-        public async Task<bool> GeneratePromoCodes(int quantity, int discount)
+        public async Task GeneratePromoCodes(int quantity, int discount)
         {
             var newPromoCodesList = new List<PromoCode>();
             for (int i = 0; i < quantity; i++)
@@ -52,13 +52,11 @@ namespace ASPNetCoreWebApi.Repositories
             }
             catch
             {
-                return false;
+                throw;
             }
-
-            return true;
         }
 
-        public async Task<PromoCodesDTO> GetAllItems(string searchText, int pageSize, int pageIndex, bool? getOnlyUsed)
+        public async Task<PromoCodesDTO> GetAllItems(string searchText, int pageIndex, int pageSize, bool? getOnlyUsed)
         {
             var result = new PromoCodesDTO();
             result.PromoCodeList = new List<PromoCodeDTO>();

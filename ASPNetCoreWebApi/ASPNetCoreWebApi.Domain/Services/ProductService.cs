@@ -23,9 +23,9 @@ namespace ASPNetCoreWebApi.Domain.Services
             return _repository.Add(_mapper.Map<Product>(newItem));
         }
 
-        public Task<ProductsDTO> GetAllItems(int? categoryId, string searchText, int pageSize, int pageIndex)
+        public Task<ProductsDTO> GetAllItems(int? categoryId, string searchText, int pageIndex, int pageSize)
         {
-            return _repository.GetAllItems(categoryId, searchText, pageSize, pageIndex);
+            return _repository.GetAllItems(categoryId, searchText, pageIndex, pageSize);
         }
 
         public Task<List<ProductDTO>> GetAllByIds(List<int> ids)
@@ -38,14 +38,14 @@ namespace ASPNetCoreWebApi.Domain.Services
             return await _repository.GetById(id);
         }
 
-        public Task<bool> Remove(int id)
-        {
-            return _repository.Remove(id);
-        }
-
         public Task<Product> Update(ProductDTO item)
         {
             return _repository.Update(_mapper.Map<Product>(item));
+        }
+
+        public Task Remove(int id)
+        {
+            return _repository.Remove(id);
         }
     }
 }

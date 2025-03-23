@@ -32,12 +32,15 @@ namespace ASPNetCoreWebApi.Repositories
             }
         }
 
-        public async Task<ProductsDTO> GetAllItems(int? categoryId, string searchText, int pageSize, int pageIndex)
+        public async Task<ProductsDTO> GetAllItems(int? categoryId, string searchText, int pageIndex, int pageSize)
         {
             var result = new ProductsDTO();
             result.ProductList = new List<ProductDTO>();
 
-            var products = _context.Products.AsNoTracking().Include(x => x.Category).Include(x => x.OrderItems).AsQueryable();
+            var products = _context.Products.AsNoTracking()
+                .Include(x => x.Category)
+                .Include(x => x.OrderItems)
+                .AsQueryable();
             string summaryTextAdd = "";
 
             if (categoryId != null || searchText != null)
@@ -54,8 +57,10 @@ namespace ASPNetCoreWebApi.Repositories
 
             if (searchText != null)
             {
-                products = products.Where(x => x.Name.ToLower().Contains(searchText.ToLower())
-                || x.Description.ToLower().Contains(searchText.ToLower()));
+                products = products.Where(x => x.Name.ToLower()
+                .Contains(searchText
+                .ToLower()) || x.Description.ToLower()
+                .Contains(searchText.ToLower()));
             }
 
             int totalCount = await products.CountAsync();
@@ -85,60 +90,51 @@ namespace ASPNetCoreWebApi.Repositories
                .SingleOrDefaultAsync(a => a.Id == id);
         }
 
-        public async Task<bool> Remove(int id)
+        public async Task<Product> Update(Product item)
         {
-            using var transaction = _context.Database.BeginTransaction();
+            var existing = await _context.Products.AsNoTracking()
+                .SingleOrDefaultAsync(a => a.Id == item.Id);
+
+            item.CreatedDate = existing.CreatedDate;
+            _context.Products.Update(item);
             try
             {
-                Product entity = await _context.Products.SingleOrDefaultAsync(a => a.Id == id);
-                if (entity != null)
-                {
-                    var ordersToDelete = _context.OrderItems.Include(x => x.Order)
-                        .Where(x => x.ProductId == entity.Id)
-                        .Select(x => x.Order);
-
-                    if (ordersToDelete.Any())
-                    {
-                        _context.Orders.RemoveRange(ordersToDelete);
-                        await _context.SaveChangesAsync();
-                    }
-
-                    _context.Products.Remove(entity);
-
-                    await _context.SaveChangesAsync();
-                    transaction.Commit();
-                }
+                await _context.SaveChangesAsync();
             }
             catch
             {
                 throw;
             }
-            return true;
-        }
-
-        public async Task<Product> Update(Product item)
-        {
-            var existing = await _context.Products.AsNoTracking()
-                .SingleOrDefaultAsync(a => a.Id == item.Id);
-            if (existing != null)
-            {
-                item.CreatedDate = existing.CreatedDate;
-                _context.Products.Update(item);
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch
-                {
-                    throw;
-                }
-            }
-            else
-            {
-                throw new Exception($"product with id: {item.Id} not found.");
-            }
 
             return existing;
+        }
+
+        public async Task Remove(int id)
+        {
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                Product entity = await _context.Products.SingleOrDefaultAsync(a => a.Id == id);
+
+                var ordersToDelete = _context.OrderItems.Include(x => x.Order)
+                    .Where(x => x.ProductId == entity.Id)
+                    .Select(x => x.Order);
+
+                if (ordersToDelete.Any())
+                {
+                    _context.Orders.RemoveRange(ordersToDelete);
+                    await _context.SaveChangesAsync();
+                }
+
+                _context.Products.Remove(entity);
+
+                await _context.SaveChangesAsync();
+                transaction.Commit();
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public ValueTask DisposeAsync()
