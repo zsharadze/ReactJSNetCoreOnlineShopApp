@@ -13,7 +13,7 @@ Usage of Reactjs functional components, usage of React Redux Toolkit for state m
 6. Open terminal and run npm install command to install node modules.
 7. Run ReactJS project with npm start and you are done.
 
-![screenshot](https://github.com/zsharadze/ReactJSNetCoreOnlineShopApp/blob/master/Capture1.png?raw=true)
+![screenshot](https://github.com/zsharadze/ReactJSNetCoreOnlineShopApp/blob/master/Capture1_1.PNG?raw=true)
 
 ![screenshot](https://github.com/zsharadze/ReactJSNetCoreOnlineShopApp/blob/master/Capture2.png?raw=true)
 
@@ -25,7 +25,7 @@ Usage of Reactjs functional components, usage of React Redux Toolkit for state m
 
 ![screenshot](https://github.com/zsharadze/ReactJSNetCoreOnlineShopApp/blob/master/Capture6.png?raw=true)
 
-![screenshot](https://github.com/zsharadze/ReactJSNetCoreOnlineShopApp/blob/master/Capture7.png?raw=true)
+![screenshot](https://github.com/zsharadze/ReactJSNetCoreOnlineShopApp/blob/master/Capture7_7.PNG?raw=true)
 
 ![screenshot](https://github.com/zsharadze/ReactJSNetCoreOnlineShopApp/blob/master/Capture8.png?raw=true)
 
