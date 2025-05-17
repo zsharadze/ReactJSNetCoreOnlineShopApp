@@ -126,12 +126,6 @@ export default function Layout({ children, ...props }: any) {
             >
               <ListItemButton>
                 <ListItemIcon>
-                  {item.faClass && (
-                    <>
-                      <i className={item.faClass + " menuIcon"}></i>
-                      <Box ml={2}>{item.name}</Box>
-                    </>
-                  )}
                   {item.imageName && (
                     <>
                       <img

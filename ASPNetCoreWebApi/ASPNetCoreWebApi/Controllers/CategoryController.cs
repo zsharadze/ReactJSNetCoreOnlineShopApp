@@ -70,11 +70,6 @@ namespace ASPNetCoreWebApi.Controllers
                 _imageDeleter.DeleteImage(oldCategory.ImageName, "images\\categories");
             }
 
-            if (!string.IsNullOrEmpty(category.FaClass))
-            {
-                _imageDeleter.DeleteImage(oldCategory.ImageName, "images\\categories");
-                imageFileName = null;
-            }
             category.ImageName = imageFileName;
 
             await _categoryService.Update(category);

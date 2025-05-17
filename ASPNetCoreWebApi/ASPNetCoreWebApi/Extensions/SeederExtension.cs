@@ -24,17 +24,17 @@ namespace ASPNetCoreWebApi.Extensions
                     //insert categories
                     Category categoryDesktop = new Category();
                     categoryDesktop.Name = "Desktops";
-                    categoryDesktop.FaClass = "fa fa-desktop";
+                    categoryDesktop.ImageName = "Desktops.png";
                     context.Categories.Add(categoryDesktop);
 
                     Category categoryLaptop = new Category();
                     categoryLaptop.Name = "Laptops";
-                    categoryLaptop.FaClass = "fa fa-laptop";
+                    categoryLaptop.ImageName = "Laptops.png";
                     context.Categories.Add(categoryLaptop);
 
                     Category categoryTablet = new Category();
                     categoryTablet.Name = "Tablets";
-                    categoryTablet.FaClass = "fa fa-tablet";
+                    categoryTablet.ImageName = "Tablets.png";
                     context.Categories.Add(categoryTablet);
                     //
 

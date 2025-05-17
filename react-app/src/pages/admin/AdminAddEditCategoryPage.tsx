@@ -12,19 +12,13 @@ import { useParams } from "react-router-dom";
 
 const AdminAddEditCategory = () => {
   const [name, setName] = useState("");
-  const [fontAwsomeClassName, setFontAwsomeClassName] = useState("");
   const [nameInputFocusedFirstTime, setNameInputFocusedFirstTime] =
     useState(false);
-  const [
-    fontAwsomeClassNameInputFocusedFirstTime,
-    setFontAwsomeClassNameInputFocusedFirstTime,
-  ] = useState(false);
   const [categoryId, setCategoryId] = useState<number>(0);
   const [imageName, setImageName] = useState<string>();
   const [imagePreviewSrc, setImagePreviewSrc] = useState<string>();
   const [imageFile, setImageFile] = useState();
   const [loading, setLoading] = useState(false);
-  const [fontAwsomeOrImage, setFontAwsomeOrImage] = useState("fontAwsome");
   const navigate = useNavigate();
   const params = useParams();
   const imagesUrl = process.env.REACT_APP_IMAGES_URL;
@@ -39,11 +33,7 @@ const AdminAddEditCategory = () => {
         .then((res) => {
           setLoading(false);
           setName(res.data.name);
-          setFontAwsomeClassName(res.data.faClass ?? "");
           setImageName(res.data.imageName);
-          if (!res.data.faClass) {
-            setFontAwsomeOrImage("image");
-          }
         });
     }
   }, []);
@@ -74,25 +64,15 @@ const AdminAddEditCategory = () => {
     });
   };
 
-  const onFontAwsomeAndImageChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setImageName("");
-    setImagePreviewSrc("");
-    setImageFile(undefined);
-    setFontAwsomeClassName("");
-    setFontAwsomeOrImage((event.target as HTMLInputElement).value);
-  };
-
   const handleAddEditCategory = () => {
-    if (!name || (fontAwsomeOrImage === "fontAwsome" && !fontAwsomeClassName)) {
+    if (!name) {
       Swal.fire({
         title: "Error",
-        text: "Please fill all the fields",
+        text: "Please enter category name",
         icon: "error",
       });
       return;
-    } else if (fontAwsomeOrImage === "image" && !imageFile && !imageName) {
+    } else if (!imageFile && !imageName) {
       Swal.fire({
         title: "Error",
         text: "Please upload image",
@@ -104,7 +84,6 @@ const AdminAddEditCategory = () => {
     const formData = new FormData();
     formData.append("id", categoryId?.toString() ?? "0");
     formData.append("name", name);
-    formData.append("faClass", fontAwsomeClassName);
     formData.append("imageName", imageName!?.toString());
     if (imageFile) {
       formData.set("imageFile", imageFile);
@@ -115,7 +94,6 @@ const AdminAddEditCategory = () => {
       categoryApi()
         .create(formData)
         .then((res) => {
-          
           redirectToAdminCategories();
         })
         .catch((error) => {})
@@ -129,11 +107,10 @@ const AdminAddEditCategory = () => {
         .then((res) => {
           redirectToAdminCategories();
         })
-        .catch((error) => {
-          
-        }).finally(() => {
+        .catch((error) => {})
+        .finally(() => {
           setLoading(false);
-        });;
+        });
     }
   };
 
@@ -169,26 +146,7 @@ const AdminAddEditCategory = () => {
           }}
         />
       </Box>
-      <Box>
-        <RadioGroup
-          row
-          value={fontAwsomeOrImage}
-          name="row-radio-buttons-group"
-          onChange={onFontAwsomeAndImageChange}
-        >
-          <FormControlLabel
-            value="fontAwsome"
-            control={<Radio />}
-            label="Font awsome class"
-          />
-          <FormControlLabel
-            value="image"
-            control={<Radio />}
-            label="Upload Image"
-          />
-        </RadioGroup>
-      </Box>
-      <Box sx={{ display: fontAwsomeOrImage === "image" ? "block" : "none" }}>
+      <Box sx={{ display: "block" }}>
         <label
           htmlFor="imageUploadAddEditProduct"
           className={`${styles.customFileUpload}`}
@@ -202,6 +160,8 @@ const AdminAddEditCategory = () => {
           className={`${styles.fileUploadHide}`}
           onChange={(e) => setAddEditCategoryImageFile(e)}
         />
+      </Box>
+       <Box sx={{ display: "block" }}>
         <img
           style={{ display: imagePreviewSrc || imageName ? "" : "none" }}
           className={`${styles.addProductShowImg}`}
@@ -213,34 +173,6 @@ const AdminAddEditCategory = () => {
               : ""
           }
           alt="productImage"
-        />
-      </Box>
-      <Box sx={{ display: fontAwsomeOrImage !== "image" ? "block" : "none" }}>
-        <TextField
-          id="fontAwsomeClass"
-          size="small"
-          margin="normal"
-          required
-          type="text"
-          label="Fa class name"
-          value={fontAwsomeClassName}
-          onChange={(e) => {
-            setFontAwsomeClassName(e.target.value);
-          }}
-          onFocus={() => {
-            setFontAwsomeClassNameInputFocusedFirstTime(true);
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              "&.MuiInputBase-root fieldset": {
-                borderColor:
-                  fontAwsomeClassNameInputFocusedFirstTime &&
-                  fontAwsomeClassName.length === 0
-                    ? "red"
-                    : "inherit",
-              },
-            },
-          }}
         />
       </Box>
       <Box sx={{ marginTop: "15px" }}>

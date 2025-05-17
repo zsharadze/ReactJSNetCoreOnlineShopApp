@@ -1,97 +1,113 @@
-
 .productImgAdmin {
-    width: 100%;
-    height: 100%;
-  }
+  width: 100%;
+  height: 100%;
+}
 
-  .categoryImgAdmin {
-    width: 100%;
-    height: 100%;
-  }
-  
-  .editBtn {
-    font-size: 26px !important;
-    cursor: pointer;
-    margin-right: 10px;
-  }
-  
-  .deleteBtn {
-    margin-left: 3px;
-    font-size: 26px !important;
-    cursor: pointer;
-  }
-  
-  .adminProductsTableTd{
-    border-top: 1px solid black;
-  }
+.categoryImgAdmin {
+  width: 100%;
+  height: 40px;
+  object-fit: scale-down;
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+  min-width: 150px;
+}
 
-  .adminCategoriesTableTd{
-    border-top: 1px solid black;
-  }
+.editBtn {
+  font-size: 26px !important;
+  cursor: pointer;
+  margin-right: 10px;
+}
 
-  .adminProductsTableTdPadding{
-    padding-left: 10px;
-    padding-right: 10px;
-  }
+.deleteBtn {
+  margin-left: 3px;
+  font-size: 26px !important;
+  cursor: pointer;
+}
 
-  .adminCategoriesTableTdPadding{
-    padding-left: 10px;
-    padding-right: 10px;
-  }
+.adminProductsTableTd {
+  border-top: 1px solid black;
+}
 
-  .adminPromoCodesTableTdPadding{
-    padding-left: 10px;
-    padding-right: 10px;
-  }
+.adminCategoriesTableTd {
+  border-top: 1px solid black;
+}
 
-  .adminProductsTableTdCenter{
-    text-align: center;
-  }
+.adminCategoriesTableTdActionBtns {
+  border-top: 1px solid black;
+  text-align: right;
+}
 
-  .adminProductsTableThLeft{
-    text-align: left;
-  }
+.adminProductsTableTdPadding {
+  padding-left: 10px;
+  padding-right: 10px;
+}
 
-  .adminCategoriesTableThLeft{
-    text-align: left;
-  }
+.adminCategoriesTableTdPadding {
+  padding-left: 10px;
+  padding-right: 10px;
+}
 
-  .adminPromoCodesTableThLeft{
-    text-align: left;
-  }
+.adminPromoCodesTableTdPadding {
+  padding-left: 10px;
+  padding-right: 10px;
+}
 
-  .adminAddBtn {
-    font-size: 26px !important;
-    margin-top: 15px;
-    cursor: pointer;
-  }
+.adminProductsTableTdCenter {
+  text-align: center;
+}
 
-  .addItemTextInputWrapper {
-    display: flex;
-    flex-direction: row;
-  }
-  
-  .customFileUpload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-  }
+.adminProductsTableThLeft {
+  text-align: left;
+}
 
-  .addProductShowImg {
-    width: 100px;
-    height: 100px;
-    margin-top: 7px;
-    margin-left: 27px;
-    vertical-align: top;
-  }
+.adminCategoriesTableThLeft {
+  text-align: left;
+}
 
-  .fileUploadHide{
-    display: none;
-  }
+.adminCategoriesTableThRight {
+  text-align: right;
+}
 
-  .adminPromoCodesTable{
-    border-collapse:collapse;
-     width: 50%;
-     margin-top: 15px;
-  }
+.adminCategoriesTableThCenter {
+  text-align: center;
+}
+
+.adminPromoCodesTableThLeft {
+  text-align: left;
+}
+
+.adminAddBtn {
+  font-size: 26px !important;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.addItemTextInputWrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.customFileUpload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.addProductShowImg {
+  width: 100px;
+  height: 100px;
+  margin-top: 7px;
+  margin-left: 27px;
+  vertical-align: top;
+}
+
+.fileUploadHide {
+  display: none;
+}
+
+.adminPromoCodesTable {
+  border-collapse: collapse;
+  width: 50%;
+  margin-top: 15px;
+}

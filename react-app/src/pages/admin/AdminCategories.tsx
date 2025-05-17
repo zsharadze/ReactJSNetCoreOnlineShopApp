@@ -59,12 +59,7 @@ const AdminCategories = () => {
             >
               Name
             </th>
-            <th
-              className={`${styles.adminCategoriesTableThLeft} ${styles.adminCategoriesTableTdPadding}`}
-            >
-              Fa Class
-            </th>
-            <th className={`${styles.adminCategoriesTableThLeft}`}>Image</th>
+            <th className={`${styles.adminCategoriesTableThCenter}`}>Image</th>
             <th></th>
           </tr>
         </thead>
@@ -81,11 +76,6 @@ const AdminCategories = () => {
                     {item.name}
                   </td>
                   <td
-                    className={`${styles.adminCategoriesTableTd} ${styles.adminCategoriesTableTdPadding}`}
-                  >
-                    {item.faClass}&nbsp;<i className={item.faClass}></i>
-                  </td>
-                  <td
                     style={{ maxWidth: "100px", maxHeight: "100px" }}
                     className={`${styles.adminCategoriesTableTd}`}
                   >
@@ -97,7 +87,7 @@ const AdminCategories = () => {
                       />
                     )}
                   </td>
-                  <td className={`${styles.adminCategoriesTableTd}`}>
+                  <td className={`${styles.adminCategoriesTableTdActionBtns}`}>
                     <i
                       title="Edit"
                       className={`fa fa-edit ${styles.editBtn}`}

@@ -98,9 +98,6 @@ namespace ASPNetCoreWebApi.Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("FaClass")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ImageName")
                         .HasColumnType("nvarchar(max)");
 
