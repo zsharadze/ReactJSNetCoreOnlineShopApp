@@ -13,6 +13,8 @@ Usage of Reactjs functional components, usage of React Redux Toolkit for state m
 6. Open terminal and run npm install command to install node modules.
 7. Run ReactJS project with npm start and you are done.
 
+[Same project in Angular 18](https://github.com/zsharadze/AngularNetCoreOnlineShopApp). [Same project in NextJS](https://github.com/zsharadze/nextjs-online-shop-app).
+
 ![screenshot](https://github.com/zsharadze/ReactJSNetCoreOnlineShopApp/blob/master/Capture1_1.PNG?raw=true)
 
 ![screenshot](https://github.com/zsharadze/ReactJSNetCoreOnlineShopApp/blob/master/Capture2.png?raw=true)
